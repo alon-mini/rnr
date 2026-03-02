@@ -160,13 +160,18 @@ The output — `style_skill.md` — feeds directly into every single revision wo
 /rnr:process-comments
 ```
 
-The system loops through every single extracted comment:
+The system first reads all extracted comments and **classifies** them into:
+1. **Isolated Comments** — Safe to fix independently.
+2. **Interlaced Groups** — Comments that overlap, relate to the same text, or depend on each other.
 
-1. **Classifies** — An agent decides if the comment requires external data (e.g., "Add a citation from Smith 2023"). If so, it throws a human checkpoint and asks you to provide the PDF or context. The agent will also converse with you to clarify any vague or non-actionable comments.
-2. **Executes** — A fresh context window is initialized with your `style_skill.md` and the singular isolated comment. The agent directly applies edit suggestions or drafts new text perfectly matching your style.
-3. **Replies** — Synthesizes a drafted response for your "Response to Reviewers" letter.
+Then, the system executes the revisions:
 
-Each fix is entirely independent. No context degradation.
+1. **Classifies Requirements** — For each comment/group, an agent decides if external data is needed. If so, it throws a human checkpoint. The agent will also converse with you to clarify any vague or non-actionable comments.
+2. **Executes Isolated** — Spawns parallel subagents (1 isolate agent per comment) to surgically draft text precisely matching your style.
+3. **Executes Interlaced Groups** — Spawns 1 dedicated subagent per group to resolve the related comments together, ensuring consistency.
+4. **Replies** — Synthesizes a drafted response for your "Response to Reviewers" letter.
+
+Each isolated fix and interlaced group fix is entirely independent. No context degradation.
 
 **Creates:** `data/COMMENT_{ID}_RESOLVED.md`
 
