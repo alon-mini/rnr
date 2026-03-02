@@ -23,11 +23,12 @@ Iterate through every `COMMENT_<ID>.md` file in `data/`, resolve the requested r
       claude -p "Resolve the comment in data/COMMENT_<ID>.md. You must adhere strictly to the author's conventions in skills/style_skill.md. 
       Rules:
       1. If the comment requires external data or context (like summarizing a paper or checking facts), you must use your MCP tools (specifically notebooklm or notebooklm-mcp-cli) to research the answer from the user's notebook at: {notebook_id}.
-      2. Draft a revised text block.
-      3. Draft a strict, swift revision note (1 sentence maximum, 2 only if absolutely necessary) replying to the reviewer stating what was done. It must not be too formal.
-      4. Save your output to data/COMMENT_<ID>_RESOLVED.md using strictly this XML format:
+      2. Draft the exact revised text block that will replace the original text in the document. You MUST execute the revision yourself. Do NOT output manual instructions like 'Look at the comments as a reference guide and manually fix'. If the reviewer's comment is an edit suggestion, you must accept it and generate the text with the edit applied in the revised text block.
+      3. If the comment is vague or explicitly non-actionable as-is, you MUST use the AskUserQuestion tool to elaborate and converse with the user until the comment becomes actionable BEFORE you output the RESOLVED.md file.
+      4. Draft a strict, swift revision note (1 sentence maximum, 2 only if absolutely necessary) replying to the reviewer stating what was done. It must not be too formal.
+      5. Save your output to data/COMMENT_<ID>_RESOLVED.md using strictly this XML format:
          <revised_text>
-         [The revised text block]
+         [The exact revised text block]
          </revised_text>
          <reviewer_reply>
          [The drafted reply]

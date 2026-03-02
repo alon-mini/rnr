@@ -107,7 +107,19 @@ claude --dangerously-skip-permissions
 
 ## How It Works
 
-### 1. Extract Comments & Target Text
+### 1. Initialize Working Directory
+
+```
+/rnr:init
+```
+
+R&R relies on strictly deterministic Python scripts to parse and assemble Word documents (to avoid AI hallucination and formatting rot). This command locates your R&R installation and copies `src/parser.py` and `src/assembler.py` into a hidden `.rnr/` folder in your current directory.
+
+**Creates:** `.rnr/src/`
+
+---
+
+### 2. Extract Comments & Target Text
 
 ```
 /rnr:extract-comments document.docx [reviewer_name]
@@ -123,7 +135,7 @@ One command. The system:
 
 ---
 
-### 2. Synthesize Style
+### 3. Synthesize Style
 
 ```
 /rnr:synthesize-style
@@ -142,7 +154,7 @@ The output — `style_skill.md` — feeds directly into every single revision wo
 
 ---
 
-### 3. Orchestrate Revisions
+### 4. Orchestrate Revisions
 
 ```
 /rnr:process-comments
@@ -150,8 +162,8 @@ The output — `style_skill.md` — feeds directly into every single revision wo
 
 The system loops through every single extracted comment:
 
-1. **Classifies** — An agent decides if the comment requires external data (e.g., "Add a citation from Smith 2023"). If so, it throws a human checkpoint and asks you to provide the PDF or context.
-2. **Executes** — A fresh context window is initialized with your `style_skill.md` and the singular isolated comment.
+1. **Classifies** — An agent decides if the comment requires external data (e.g., "Add a citation from Smith 2023"). If so, it throws a human checkpoint and asks you to provide the PDF or context. The agent will also converse with you to clarify any vague or non-actionable comments.
+2. **Executes** — A fresh context window is initialized with your `style_skill.md` and the singular isolated comment. The agent directly applies edit suggestions or drafts new text perfectly matching your style.
 3. **Replies** — Synthesizes a drafted response for your "Response to Reviewers" letter.
 
 Each fix is entirely independent. No context degradation.
@@ -160,7 +172,7 @@ Each fix is entirely independent. No context degradation.
 
 ---
 
-### 4. Assemble Final Document
+### 5. Assemble Final Document
 
 ```
 /rnr:assemble output_revised.docx
@@ -217,6 +229,7 @@ R&R hooks directly into Anthropic's validated `unpack.py` and `pack.py` python t
 
 | Command | What it does |
 |---------|--------------|
+| `/rnr:init` | Installs the parser and assembler scripts to a `.rnr/` folder in the current directory |
 | `/rnr:extract-comments <file>` | Unpacks the `.docx` into XML and extracts Reviewer 1/2 comments |
 | `/rnr:synthesize-style` | Constructs `style_skill.md` from your writing |
 | `/rnr:process-comments` | Iterates through each comment, prompting for human context when needed |
