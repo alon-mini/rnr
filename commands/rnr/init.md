@@ -16,6 +16,9 @@ Find the original R&R installation directory and copy its `src/` folder into a h
 4. Use the `AskUserQuestion` tool to ask if they want to connect a NotebookLM notebook to this project. Ask them to provide the notebook ID or URL, or reply "none" to skip.
 5. If they provide an ID or URL, extract the ID and write it to `.rnr/config.json` like this: `{"notebook_id": "the_id"}`.
 6. If they provided an ID, use bash to execute: `claude mcp add notebooklm notebooklm-mcp-cli` to ensure the server is configured. If they reply "none", write `{"notebook_id": null}`.
-7. Verify that `.rnr/src/parser.py` exists using bash.
-8. Report success to the user and politely remind them to add `.rnr` to their `.gitignore` file. Let them know they can now run `/rnr:extract-comments`.
+7. If an ID was provided and the MCP server was added, perform a test query to verify the connection is active. Spawn a test subagent locally or use the appropriate MCP tool to simply ask the given NotebookLM ID: "What is the title of this notebook?".
+   - *If the test query succeeds:* Report to the user that NotebookLM is successfully connected.
+   - *If the test query fails:* Warn the user that the NotebookLM connection failed, and they may need to authenticate or troubleshoot their MCP setup.
+8. Verify that `.rnr/src/parser.py` exists using bash.
+9. Report success to the user and politely remind them to add `.rnr` to their `.gitignore` file. Let them know they can now run `/rnr:extract-comments`.
 </process>

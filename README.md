@@ -19,161 +19,92 @@ node bin/install.js --claude --local
 
 <br>
 
-*"If you have reviewer comments embedded in a docx, this WILL resolve them and output a perfectly formatted document. No bs."*
+# Revise & Resubmit (R&R) Framework
+*An automated, agent-based academic revision ecosystem powered by Claude Code.*
 
-<br>
+## What is R&R?
+When you submit an academic paper, peer reviewers often send back a Microsoft Word `.docx` file filled with dozens (or hundreds) of comments and edit suggestions. 
 
-[Why I Built This](#why-i-built-this) · [How It Works](#how-it-works) · [Commands](#commands) · [Why It Works](#why-it-works)
+Manually going through every comment, finding the context, researching the change, negotiating with the reviewer, and rewriting the text can take weeks. 
 
-</div>
-
----
-
-## Why I Built This
-
-I'm an academic. I don't want to spend 40 hours manually executing "Reviewer 2's" pedantic formatting and re-wording requests — Claude should do it.
-
-Other RAG pipelines and LLM tools exist for writing papers. But they all seem to destroy your formatting, lose your tracked changes, or hallucinate a completely different authorial voice. I'm not looking for an AI to write my paper from scratch. I'm just an author trying to get my paper accepted without losing my sanity.
-
-So I built R&R. The complexity is in the system, not in your workflow. Behind the scenes: raw XML unpacking, strictly constrained subagent orchestration, and context isolation. What you see: a few custom Claude commands that just work.
-
-The system gives Claude exactly one comment and one paragraph at a time, strictly enforcing your synthesized writing style. It just does a good job.
-
-That's what this is. No complex Python LangChain pipelines. Just an incredibly effective system for resolving academic comments consistently using Claude Code.
-
-— **Alon**
+**Revise & Resubmit (R&R)** is a custom `get-shit-done` style framework for Claude Code that automates this entire process. You simply point R&R at the `.docx` file, and a specialized team of AI "subagents" will extract the comments, edit the manuscript based on your personal writing style, research external data if needed, ask you clarifying questions, and quickly repack a finished `.docx` file ready for submission.
 
 ---
 
-LLM text editing has a bad reputation. You upload a `.docx`, ask for a revision, and you get back a document with completely destroyed margins, missing citations, and an AI-sounding tone.
+## How It Works: The Subagent Ecosystem (In Layman's Terms)
 
-R&R fixes that. It's the context engineering layer that makes Claude Code a reliable editor. It unpacks the raw XML, isolates the exact comment, and lets Claude Code execute surgical strikes.
+R&R doesn't just use one massive AI that tries to do everything at once (which usually leads to the AI getting confused, skipping comments, or making things up). 
 
----
+Instead, it relies on a **Subagent Ecosystem**—a highly specialized team of mini-AIs where each agent has exactly one precise job. 
 
-## Who This Is For
+Here is the assembly line:
 
-Academics and researchers who want to resolve inline Reviewer Comments on `.docx` files automatically, while flawlessly preserving their original formatting, tables, and tracking data.
+### 1. The Extractors & Assemblers
+*   **The Extractor:** When you run `/rnr:extract-comments`, R&R spawns a specialized python-runner agent. Its only job is to silently open your `.docx`, find every single Reviewer comment and Edit Suggestion, extract the exact paragraph they attached it to, and save them as individual files (e.g., `COMMENT_1.md`, `COMMENT_2.md`).
+*   **The Assembler:** At the very end, when you run `/rnr:assemble`, a new dedicated agent takes all the revised paragraphs and perfectly injects them back into a clean, formatted `.docx` file without messing up your citations or graphs.
+
+### 2. The Processors (The Heavy Lifters)
+When you tell R&R to get to work (`/rnr:process-comments`), it looks at the extracted files and sorts them:
+*   **Isolated Comments:** Typos or localized changes that don't affect anything else. R&R spawns one **Fresh Processor Agent** for *each* isolated comment simultaneously. 
+*   **Interlaced Comments:** If a reviewer says "move this here" in comment 4, and "delete this" in comment 5, R&R groups them. It assigns one **Dedicated Processor Agent** to handle that specific group together so the edits make sense.
+
+*Crucially, Processor Agents do NOT talk to you, and they do NOT search the internet. They only look at the comment, look at your style guide, and rewrite the text.*
+
+### 3. The Delegates (The Specialists)
+If a Processor Agent encounters a problem it can't solve by just rewriting text, it asks for help from the specialists:
+*   **The Researcher:** If the reviewer asks "Can you add a citation for this claim?", the Processor stops and spawns a **Researcher Agent**. The Researcher silently connects to your Google NotebookLM (containing all your PDFs and research), finds the exact answer, and hands it back to the Processor to write the revision.
+*   **The Clarifier:** If the reviewer leaves a vague comment like "I don't like this," the Processor stops and spawns a **Clarifier Agent**. The Clarifier will pop up in your terminal, explain the ambiguity, and chat with you to figure out what you want to do. Once you decide, the Clarifier hands your instruction back to the Processor to execute the edit.
 
 ---
 
 ## Getting Started
 
-Clone the repository to your machine (you can keep this folder anywhere):
+### Prerequisites
+1.  You must have **Claude Code** installed.
+2.  Your terminal must be running in the folder where your manuscript `.docx` is located.
+3.  *(Highly Recommended)* Install the NotebookLM MCP tool so R&R can do automated research:
+    `claude mcp add notebooklm notebooklm-mcp-cli`
 
+### Installation
+Clone this repository to your machine. Then, in your terminal, run:
 ```bash
-git clone https://github.com/alon-mini/rnr.git
-cd rnr
-# Install dependencies for the XML tools and NotebookLM MCP
-pip install python-docx anthropic lxml pydantic docx-comments defusedxml notebooklm-mcp-cli
+node /path/to/rnr/bin/install.js
 ```
+This registers the R&R commands with Claude Code.
 
-### Option 1: Global Installation (Recommended)
-
-Install the R&R commands into your global Claude Code configuration (`~/.claude/`). This makes the `/rnr:*` commands available in **every project** on your computer.
-
+### Step 1: Initialize the Project
+Navigate to the directory containing your `.docx` manuscript and run:
 ```bash
-node bin/install.js --claude --global
-```
-
-### Option 2: Local Installation
-
-Install the R&R commands only into the current directory's `.claude/` folder. This is useful if you only want the framework available when working inside this specific folder.
-
-```bash
-node bin/install.js --claude --local
-```
-
-Verify the installation by opening Claude Code and typing:
-- `/rnr:help`
-
-### Recommended: NotebookLM Integration
-
-R&R supports automated research for answering reviewer comments using your own data in NotebookLM. 
-To enable this, install and configure the [notebooklm-mcp-cli](https://github.com/jacob-bd/notebooklm-mcp-cli) directly in Claude Code. Once installed, R&R subagents will automatically use it to look up empirical data, citations, or context whenever a reviewer asks a question they don't have the answer to.
-
-### Recommended: Skip Permissions Mode
-
-R&R relies heavily on executing `<bash>` commands to run its Python-based `unpack.py` and `pack.py` DOCX toolkit. Run Claude Code with:
-
-```bash
-claude --dangerously-skip-permissions
-```
-
-> [!TIP]
-> This is how R&R is intended to be used — stopping to approve `python src/parser.py` 50 times defeats the purpose.
-
----
-
-## How It Works
-
-### 1. Initialize Working Directory
-
-```
 /rnr:init
 ```
+This sets up the hidden environment (`.rnr/`) that allows the Subagents to run perfectly isolated scripts. It will also ask you to link a specific NotebookLM notebook so the **Researcher Agents** know where to look.
 
-R&R relies on strictly deterministic Python scripts to parse and assemble Word documents (to avoid AI hallucination and formatting rot). This command locates your R&R installation and copies `src/parser.py` and `src/assembler.py` into a hidden `.rnr/` folder in your current directory.
-
-**Creates:** `.rnr/src/`
-
----
-
-### 2. Extract Comments & Target Text
-
-```
-/rnr:extract-comments document.docx [reviewer_name]
+### Step 2: Extract the Comments
+Extract the reviewer comments and map them to the document:
+```bash
+/rnr:extract-comments manuscript.docx "Reviewer 1"
 ```
 
-One command. The system:
-
-1. **Unpacks** — Uses Anthropic's DOCX skill scripts to securely extract the raw XML without corrupting styles.
-2. **Parses** — Generates a series of Markdown files for every inline comment and **edit suggestion** made by the reviewer.
-3. **Isolates** — Locates the exact paragraph of text the comment highlights.
-
-**Creates:** `unpacked/`, `data/document_map.json`, `data/COMMENT_{ID}.md`
-
----
-
-### 3. Synthesize Style
-
-```
+### Step 3: Define Your Style
+Ensure the AI edits sound exactly like you:
+```bash
 /rnr:synthesize-style
 ```
+This crawls your manuscript to map your tone, vocabulary, and sentence structures.
 
-**This is what prevents the AI from sounding like an AI.**
-
-The system analyzes your pre-extracted text and identifies your specific authorial traits:
-
-- **Visual features** → Formatting of your citations (APA, IEEE, etc.)
-- **Tone** → Lexicon, sentence length, transition preferences.
-
-The output — `style_skill.md` — feeds directly into every single revision worker execution.
-
-**Creates:** `skills/style_skill.md`
-
----
-
-### 4. Orchestrate Revisions
-
-```
+### Step 4: Unleash the Ecosystem
+Start the automated revision factory:
+```bash
 /rnr:process-comments
 ```
+Grab a coffee. The subagents will negotiate, research, and edit every comment asynchronously. If they need you, the **Clarifier** will ping you in the terminal.
 
-The system first reads all extracted comments and **classifies** them into:
-1. **Isolated Comments** — Safe to fix independently.
-2. **Interlaced Groups** — Comments that overlap, relate to the same text, or depend on each other.
-
-Then, the system executes the revisions:
-
-1. **Classifies Requirements** — For each comment/group, an agent decides if external data is needed. If so, it throws a human checkpoint. The agent will also converse with you to clarify any vague or non-actionable comments.
-2. **Executes Isolated** — Spawns parallel subagents (1 isolate agent per comment) to surgically draft text precisely matching your style.
-3. **Executes Interlaced Groups** — Spawns 1 dedicated subagent per group to resolve the related comments together, ensuring consistency.
-4. **Replies** — Synthesizes a drafted response for your "Response to Reviewers" letter.
-
-Each isolated fix and interlaced group fix is entirely independent. No context degradation.
-
-**Creates:** `data/COMMENT_{ID}_RESOLVED.md`
+### Step 5: Assemble the Final Document
+Once processing is complete, repack the manuscript:
+```bash
+/rnr:assemble final_manuscript.docx
+```
+Your paper is now ready to resubmit!
 
 ---
 
