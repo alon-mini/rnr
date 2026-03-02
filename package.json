@@ -1,0 +1,30 @@
+{
+    "name": "revise-and-resubmit-cc",
+    "version": "2.1.0",
+    "description": "An automated, agent-based academic revision ecosystem powered by Claude Code.",
+    "main": "bin/install.js",
+    "bin": {
+        "revise-and-resubmit-cc": "bin/install.js"
+    },
+    "scripts": {
+        "start": "node bin/install.js"
+    },
+    "keywords": [
+        "claude-code",
+        "anthropic",
+        "ai-agents",
+        "academic-writing",
+        "peer-review",
+        "document-automation",
+        "docx"
+    ],
+    "author": "",
+    "license": "MIT",
+    "files": [
+        "bin",
+        "commands",
+        "src",
+        "README.md",
+        "LICENSE"
+    ]
+}

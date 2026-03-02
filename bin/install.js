@@ -32,6 +32,33 @@ try {
     }
   });
 
+  // Copy agent files
+  const AGENTS_SRC = path.join(__dirname, '..', 'agents');
+  if (fs.existsSync(AGENTS_SRC)) {
+    const AGENTS_DEST = path.join(CLAUDE_DIR, 'agents');
+    fs.mkdirSync(AGENTS_DEST, { recursive: true });
+
+    // Remove old R&R agents before copying new ones
+    if (fs.existsSync(AGENTS_DEST)) {
+      for (const file of fs.readdirSync(AGENTS_DEST)) {
+        if (file.startsWith('rnr-') && file.endsWith('.md')) {
+          fs.unlinkSync(path.join(AGENTS_DEST, file));
+        }
+      }
+    }
+
+    const agentFiles = fs.readdirSync(AGENTS_SRC);
+    agentFiles.forEach(file => {
+      if (file.endsWith('.md')) {
+        fs.copyFileSync(
+          path.join(AGENTS_SRC, file),
+          path.join(AGENTS_DEST, file)
+        );
+        console.log(`✓ Installed agent: ${file.replace('.md', '')}`);
+      }
+    });
+  }
+
   console.log('\nSuccess! R&R Framework installed.');
   console.log(`Commands were installed to: ${COMMANDS_DEST}`);
   console.log('\nTo use, open Claude Code and run:');
