@@ -126,19 +126,15 @@ Walk away, come back to a completed revision.
 
 ## Why It Works
 
-### Context Engineering
+### Lean Orchestration (Zero Context Bleeding)
+A major problem with using LLMs for full document revision is "Context Rot." If the AI reads a 50-page document and 100 comments, it will start forgetting instructions, ignoring style guides, and hallucinating facts simply because its token window is exhausted.
 
-Claude Code is incredibly powerful *if* you give it the context it needs. Most people don't.
+R&R solves this with **Lean Orchestration**:
+1. **The Orchestrator is Blind:** The main AI running the `/rnr:process-comments` command is strictly forbidden from reading your manuscript or your style guide. It only coordinates the workflow. This guarantees the orchestrator never runs out of tokens and never requires you to type `/clear`.
+2. **Subagents read files natively:** When the orchestrator spawns a subagent to fix a comment, it uses a native `<files_to_read>` block to pass the *paths* to the required files (e.g., `style_skill.md`, `COMMENT_12.md`).
+3. **Fresh Context:** That subagent boots up with a completely fresh, empty context window. It uses its built-in read tools to ingest the exact style rules and the exact paragraph it needs to fix. 
 
-R&R handles it for you:
-
-| File | What it does |
-|------|--------------|
-| `style_skill.md` | Your exact writing tone and grammar rules |
-| `COMMENT_{ID}.md` | The isolated reviewer request and isolated paragraph |
-| `COMMENT_{ID}_RESOLVED.md` | XML output of the fix to be injected back |
-
-Size limits based on where Claude's quality degrades. Stay under, get consistent excellence.
+This strict separation guarantees that every single comment receives 100% of Claude's analytical focus, with zero context degradation, no matter how many comments your document has.
 
 ### XML Prompt Formatting
 

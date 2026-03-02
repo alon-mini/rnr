@@ -108,8 +108,18 @@ if (command === 'generate-prompts') {
             console.log(`Task(
   subagent_type="rnr-processor-isolated",
   model="claude-3-7-sonnet-20250219",
-  prompt="Resolve the isolated comment in data/COMMENT_${id}.md. You must adhere strictly to the author's conventions in skills/style_skill.md.
-  Rules:
+  prompt="
+  <objective>
+  Resolve the isolated comment. You must adhere strictly to the author's conventions in skills/style_skill.md.
+  </objective>
+  
+  <files_to_read>
+  Read these files at execution start using the Read tool:
+  - skills/style_skill.md
+  - data/COMMENT_${id}.md
+  </files_to_read>
+  
+  <rules>
   1. DO NOT use NotebookLM or ask the user questions directly. If you need external research context, you MUST spawn this exact subagent to get it: Task(subagent_type=\\"rnr-researcher\\", prompt=\\"Query notebook ${notebookId} for: [Your concise question]\\")
   2. If the comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type=\\"rnr-clarifier\\", prompt=\\"Present this ambiguity to the user and ask how they want to proceed: [The context]\\"). Wait for its return string.
   3. Draft the exact revised text block that will replace the original text in the document. You MUST execute the revision yourself. Do NOT output manual instructions to the user.
@@ -121,6 +131,7 @@ if (command === 'generate-prompts') {
      <reviewer_reply>
      [The drafted reply]
      </reviewer_reply>
+  </rules>
   "
 )`);
         });
@@ -137,13 +148,23 @@ if (command === 'generate-prompts') {
                 return;
             }
 
-            const filesList = group.map(id => `data/COMMENT_${id}.md`).join(', ');
+            const filesList = group.map(id => `- data/COMMENT_${id}.md`).join('\\n  ');
 
             console.log(`Task(
   subagent_type="rnr-processor-interlaced",
   model="claude-3-7-sonnet-20250219",
-  prompt="Resolve the following related comments together to ensure consistency: ${filesList}. You must adhere strictly to skills/style_skill.md.
-  Rules:
+  prompt="
+  <objective>
+  Resolve the following related comments together to ensure consistency. You must adhere strictly to skills/style_skill.md.
+  </objective>
+  
+  <files_to_read>
+  Read these files at execution start using the Read tool:
+  - skills/style_skill.md
+  ${filesList}
+  </files_to_read>
+  
+  <rules>
   1. DO NOT use NotebookLM or ask the user questions directly. If you need external research context, you MUST spawn this exact subagent to get it: Task(subagent_type=\\"rnr-researcher\\", prompt=\\"Query notebook ${notebookId} for: [Your concise question]\\")
   2. If any comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type=\\"rnr-clarifier\\", prompt=\\"Present this ambiguity to the user and ask how they want to proceed: [The context]\\"). Wait for its return string.
   3. Review how these comments relate to each other and draft the exact revised text blocks for each. You MUST execute the revisions yourself.
@@ -155,6 +176,7 @@ if (command === 'generate-prompts') {
      <reviewer_reply>
      [The drafted reply]
      </reviewer_reply>
+  </rules>
   "
 )`);
         });
