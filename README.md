@@ -191,6 +191,9 @@ node bin/install.js --claude --global
 ```
 You can now use `/rnr:update` inside Claude Code going forward.
 
+### Version 2.1.7 Notes
+- **Local Dependency Fix**: Updated the `/rnr:init` command to automatically copy `package.json` into the root`.rnr/` directory and run `npm install` to ensure that Node dependencies like `cross-spawn` can be accessed by local subagents natively.
+
 ### Version 2.1.6 Notes
 - **Extractor Quoting Bug Fix**: Fixed a critical string interpolation bug where `--reviewer "NAME"` containing spaces wasn't being correctly escaped inside the generated `Task()` python prompt literal, causing it to prematurely terminate the string and throw an `unknown option '--reviewer'` error in the Claude Code CLI.
 
