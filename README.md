@@ -191,6 +191,9 @@ node bin/install.js --claude --global
 ```
 You can now use `/rnr:update` inside Claude Code going forward.
 
+### Version 2.1.4 Notes
+- **Nested Session Fix**: Fixed an issue where `rnr-tools` orchestrated subagents would instantly crash with a `Claude Code cannot be launched inside another Claude Code session` environment restriction error.
+
 ### Version 2.1.3 Notes
 - **Context Bloat Fixes Continued**: Applied the same Node script orchestration to the `/rnr:extract-comments` and `/rnr:synthesize-style` commands. Heavy JSON reading operations are now completely buffered from the main orchestrator agent.
 - **Update Optimization**: Fixed an issue where `/rnr:update` took a long time to search for the installation path. It now checks exact npm global paths for near-instant updates.
