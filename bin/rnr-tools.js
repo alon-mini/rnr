@@ -54,9 +54,9 @@ if (command === 'execute-extractor') {
     }
 
     const taskStr = `Task(
-  subagent_type="rnr-extractor",
-  model="claude-3-haiku-20240307",
-  prompt="Execute the comment extraction tool. Run this exact bash command: \\"python .rnr/src/parser.py ${targetFile}${reviewer}\\". Report the output back to me."
+  subagent_type=\`rnr-extractor\`,
+  model=\`claude-3-haiku-20240307\`,
+  prompt=\`Execute the comment extraction tool. Run this exact bash command: 'python .rnr/src/parser.py ${targetFile}${reviewer}'. Report the output back to me.\`
 )`;
 
     console.log(`⏳ Spawning rnr-extractor...`);
@@ -87,9 +87,9 @@ if (command === 'generate-extract-task') {
     }
 
     console.log(`Task(
-  subagent_type="rnr-extractor",
-  model="claude-3-haiku-20240307",
-  prompt="Execute the comment extraction tool. Run this exact bash command: \\"python .rnr/src/parser.py ${targetFile}${reviewer}\\". Report the output back to me."
+  subagent_type=\`rnr-extractor\`,
+  model=\`claude-3-haiku-20240307\`,
+  prompt=\`Execute the comment extraction tool. Run this exact bash command: 'python .rnr/src/parser.py ${targetFile}${reviewer}'. Report the output back to me.\`
 )`);
     process.exit(0);
 }
@@ -104,18 +104,18 @@ if (command === 'generate-assemble-task') {
     }
 
     console.log(`Task(
-  subagent_type="rnr-assembler",
-  model="claude-3-haiku-20240307",
-  prompt="Execute the document assembly tool. Run this exact bash command: \\"python .rnr/src/assembler.py ${originalFile} ${outputFile}\\". Report the outcome."
+  subagent_type=\`rnr-assembler\`,
+  model=\`claude-3-haiku-20240307\`,
+  prompt=\`Execute the document assembly tool. Run this exact bash command: 'python .rnr/src/assembler.py ${originalFile} ${outputFile}'. Report the outcome.\`
 )`);
     process.exit(0);
 }
 
 if (command === 'execute-synthesizer') {
     const taskStr = `Task(
-  subagent_type="rnr-synthesizer",
-  model="claude-3-haiku-20240307",
-  prompt="
+  subagent_type=\`rnr-synthesizer\`,
+  model=\`claude-3-haiku-20240307\`,
+  prompt=\`
   <objective>
   Analyze the parsed document text to create a comprehensive skills/style_skill.md capturing the author's unique voice, terminology, and citation style.
   </objective>
@@ -129,7 +129,7 @@ if (command === 'execute-synthesizer') {
   2. Produce a meticulously structured markdown file and save it to skills/style_skill.md using the Write tool.
   3. DO NOT ask the user any questions.
   </rules>
-  "
+  \`
 )`;
 
     console.log(`⏳ Spawning rnr-synthesizer...`);
@@ -197,9 +197,9 @@ if (command === 'execute-tasks') {
 
             console.log(`⏳ Spawning subagent for COMMENT_${id}...`);
             const taskStr = `Task(
-  subagent_type="rnr-processor-isolated",
-  model="claude-3-7-sonnet-20250219",
-  prompt="
+  subagent_type=\`rnr-processor-isolated\`,
+  model=\`claude-3-7-sonnet-20250219\`,
+  prompt=\`
   <objective>
   Resolve the isolated comment. You must adhere strictly to the author's conventions in skills/style_skill.md.
   </objective>
@@ -211,8 +211,8 @@ if (command === 'execute-tasks') {
   </files_to_read>
   
   <rules>
-  1. DO NOT use NotebookLM or ask the user questions directly. If you need external research context, you MUST spawn this exact subagent to get it: Task(subagent_type=\\"rnr-researcher\\", prompt=\\"Query notebook ${notebookId} for: [Your concise question]\\")
-  2. If the comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type=\\"rnr-clarifier\\", prompt=\\"Present this ambiguity to the user and ask how they want to proceed: [The context]\\"). Wait for its return string.
+  1. DO NOT use NotebookLM or ask the user questions directly. If you need external research context, you MUST spawn this exact subagent to get it: Task(subagent_type='rnr-researcher', prompt='Query notebook ${notebookId} for: [Your concise question]')
+  2. If the comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type='rnr-clarifier', prompt='Present this ambiguity to the user and ask how they want to proceed: [The context]'). Wait for its return string.
   3. Draft the exact revised text block that will replace the original text in the document. You MUST execute the revision yourself. Do NOT output manual instructions to the user.
   4. Draft a strict, swift revision note (1 sentence maximum) replying to the reviewer stating what was done.
   5. Save your output to data/COMMENT_${id}_RESOLVED.md using strictly this XML format:
@@ -223,7 +223,7 @@ if (command === 'execute-tasks') {
      [The drafted reply]
      </reviewer_reply>
   </rules>
-  "
+  \`
 )`;
             const success = executeAgent(taskStr);
             if (success) {
@@ -249,9 +249,9 @@ if (command === 'execute-tasks') {
             console.log(`⏳ Spawning subagent for Group ${index} [${group.join(', ')}]...`);
 
             const taskStr = `Task(
-  subagent_type="rnr-processor-interlaced",
-  model="claude-3-7-sonnet-20250219",
-  prompt="
+  subagent_type=\`rnr-processor-interlaced\`,
+  model=\`claude-3-7-sonnet-20250219\`,
+  prompt=\`
   <objective>
   Resolve the following related comments together to ensure consistency. You must adhere strictly to skills/style_skill.md.
   </objective>
@@ -263,8 +263,8 @@ if (command === 'execute-tasks') {
   </files_to_read>
   
   <rules>
-  1. DO NOT use NotebookLM or ask the user questions directly. If you need external research context, you MUST spawn this exact subagent to get it: Task(subagent_type=\\"rnr-researcher\\", prompt=\\"Query notebook ${notebookId} for: [Your concise question]\\")
-  2. If any comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type=\\"rnr-clarifier\\", prompt=\\"Present this ambiguity to the user and ask how they want to proceed: [The context]\\"). Wait for its return string.
+  1. DO NOT use NotebookLM or ask the user questions directly. If you need external research context, you MUST spawn this exact subagent to get it: Task(subagent_type='rnr-researcher', prompt='Query notebook ${notebookId} for: [Your concise question]')
+  2. If any comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type='rnr-clarifier', prompt='Present this ambiguity to the user and ask how they want to proceed: [The context]'). Wait for its return string.
   3. Review how these comments relate to each other and draft the exact revised text blocks for each. You MUST execute the revisions yourself.
   4. Draft a strict, swift revision note (1 sentence maximum) for each comment.
   5. Save your output by creating a separate data/COMMENT_<ID>_RESOLVED.md file for EACH comment in your group, using strictly this XML format in each file:
@@ -275,7 +275,7 @@ if (command === 'execute-tasks') {
      [The drafted reply]
      </reviewer_reply>
   </rules>
-  "
+  \`
 )`;
             const success = executeAgent(taskStr);
             if (success) {
