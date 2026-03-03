@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const command = process.argv[2];
 
@@ -74,8 +75,8 @@ if (command === 'generate-assemble-task') {
     process.exit(0);
 }
 
-if (command === 'generate-prompts') {
-    // Generate the exact XML strings that the agent needs to execute as Tasks
+if (command === 'execute-tasks') {
+    // Execute the tasks natively using child_process
     const classificationPath = path.join(process.cwd(), 'data', 'classification.json');
     if (!fs.existsSync(classificationPath)) {
         console.error('Classification file not found.');
@@ -92,20 +93,35 @@ if (command === 'generate-prompts') {
 
     const classifications = JSON.parse(fs.readFileSync(classificationPath, 'utf8'));
 
-    console.log(`\n### Generated Execution Tasks ###\n`);
-    console.log(`Copy and execute these tasks. Wait for one wave to finish before starting the next.\n`);
+    // Helper function to safely escape quotes for bash
+    const executeAgent = (taskString) => {
+        // We use npx @anthropic-ai/claude-code with -p flag
+        const escapedPrompt = taskString.replace(/"/g, '\\"').replace(/\n/g, ' ');
+        try {
+            // Using stdio: 'pipe' to suppress loud output from clogging the main orchestrator's context.
+            // We just let it run and catch any errors.
+            execSync(`npx @anthropic-ai/claude-code -p "${escapedPrompt}"`, { stdio: 'pipe' });
+            return true;
+        } catch (error) {
+            console.error(`Error executing subagent: ${error.message}`);
+            return false;
+        }
+    };
+
+    console.log(`\n### Executing Tasks via Node Orchestrator ###\n`);
 
     // Wave 1: Isolated
     if (classifications.isolated && classifications.isolated.length > 0) {
-        console.log(`\n#### Wave 1: Isolated Comments ####\n`);
+        console.log(`\n#### Wave 1: Executing Isolated Comments ####\n`);
         classifications.isolated.forEach(id => {
             const resolvedPath = path.join(process.cwd(), 'data', `COMMENT_${id}_RESOLVED.md`);
             if (fs.existsSync(resolvedPath)) {
-                console.log(`// COMMENT_${id} already resolved. Skipping.`);
+                console.log(`✅ COMMENT_${id} already resolved. Skipping.`);
                 return;
             }
 
-            console.log(`Task(
+            console.log(`⏳ Spawning subagent for COMMENT_${id}...`);
+            const taskStr = `Task(
   subagent_type="rnr-processor-isolated",
   model="claude-3-7-sonnet-20250219",
   prompt="
@@ -133,24 +149,31 @@ if (command === 'generate-prompts') {
      </reviewer_reply>
   </rules>
   "
-)`);
+)`;
+            const success = executeAgent(taskStr);
+            if (success) {
+                console.log(`✅ Processed COMMENT_${id} successfully.`);
+            } else {
+                console.log(`❌ Failed to process COMMENT_${id}.`);
+            }
         });
     }
 
     // Wave 2: Interlaced Groups
     if (classifications.interlaced && classifications.interlaced.length > 0) {
-        console.log(`\n#### Wave 2: Interlaced Groups ####\n`);
+        console.log(`\n#### Wave 2: Executing Interlaced Groups ####\n`);
         classifications.interlaced.forEach((group, index) => {
             // Check if all are resolved
             const allResolved = group.every(id => fs.existsSync(path.join(process.cwd(), 'data', `COMMENT_${id}_RESOLVED.md`)));
             if (allResolved) {
-                console.log(`// Group ${index} already resolved. Skipping.`);
+                console.log(`✅ Group ${index} already resolved. Skipping.`);
                 return;
             }
 
             const filesList = group.map(id => `- data/COMMENT_${id}.md`).join('\\n  ');
+            console.log(`⏳ Spawning subagent for Group ${index} [${group.join(', ')}]...`);
 
-            console.log(`Task(
+            const taskStr = `Task(
   subagent_type="rnr-processor-interlaced",
   model="claude-3-7-sonnet-20250219",
   prompt="
@@ -178,7 +201,13 @@ if (command === 'generate-prompts') {
      </reviewer_reply>
   </rules>
   "
-)`);
+)`;
+            const success = executeAgent(taskStr);
+            if (success) {
+                console.log(`✅ Processed Group ${index} successfully.`);
+            } else {
+                console.log(`❌ Failed to process Group ${index}.`);
+            }
         });
     }
 }

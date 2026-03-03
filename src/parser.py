@@ -89,12 +89,12 @@ def parse_docx(file_path, reviewer=None, data_dir="data", unpack_dir="unpacked")
             if reviewer and reviewer.lower() not in author.lower():
                 continue
                 
-            cid = edit_node.getAttribute("w:id")
-            if not cid:
+            base_cid = edit_node.getAttribute("w:id")
+            if not base_cid:
                 cid = f"EDIT_{edit_id_counter}"
-                edit_id_counter += 1
             else:
-                cid = f"EDIT_{cid}"
+                cid = f"EDIT_{base_cid}_{edit_id_counter}"
+            edit_id_counter += 1
                 
             # Extract text from the edit node
             c_texts = [t.firstChild.nodeValue for t in edit_node.getElementsByTagName("w:t") if t.firstChild]

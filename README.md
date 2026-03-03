@@ -191,6 +191,10 @@ node bin/install.js --claude --global
 ```
 You can now use `/rnr:update` inside Claude Code going forward.
 
+### Version 2.1 Notes
+- **Context Bloat Fix**: Orchestration logic has been natively moved to the `.rnr/bin/rnr-tools.js` Node script to entirely prevent the main `rnr` agent from absorbing subagent execution logs.
+- **Track Changes ID Bug Fix**: Fixed a bug where multiple edit suggestions in a single paragraph sharing the same `w:id` caused their `COMMENT_<ID>.md` files to silently overwrite each other. Edit IDs are now globally unique.
+
 ---
 
 ## Security

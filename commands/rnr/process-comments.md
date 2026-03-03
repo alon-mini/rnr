@@ -26,16 +26,14 @@ Orchestrator coordinates, not executes. DO NOT read `skills/style_skill.md`, `.r
    `{"isolated": ["ID1", "ID2"], "interlaced": [["ID3", "ID4"], ["ID5", "ID6"]]}`
 
 3. **Execution Phase**:
-   Do NOT attempt to loop through the comments yourself. Instead, use the Node.js tool to generate exactly the `Task()` definitions you must execute.
+   Do NOT attempt to loop through the comments yourself. Instead, use the Node.js tool to natively orchestrate and execute the subagents.
    
    Run the following command:
    ```bash
-   node .rnr/bin/rnr-tools.js generate-prompts
+   node .rnr/bin/rnr-tools.js execute-tasks
    ```
    
-   The script will output a series of `Task(...)` blocks. You MUST literally execute each `Task()` exactly as outputted by the script. 
+   Wait for the command to finish completely. The script will handle spawning the subagents dynamically and will print out a status once all isolated and interlaced comments have been processed.
    
-   **CRITICAL RULE**: Do NOT batch them. You must pass the raw `Task(...)` string identically to the framework so it spawns a fresh subagent for each isolated item and each interlaced group. Execute Wave 1 (Isolated) in parallel. When Wave 1 finishes, execute Wave 2 (Interlaced groups).
-   
-4. Confirm to the user when all comments have a resolved file. Advise them they can run `/rnr:assemble output.docx` when ready.
+4. Confirm to the user when the node script finishes its execution and all comments have a resolved file. Advise them they can run `/rnr:assemble output.docx` when ready.
 </process>
