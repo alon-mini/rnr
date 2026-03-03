@@ -2,7 +2,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
+
+const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
 
 // Unset CLAUDECODE to bypass nested session restrictions when spawning subagents
 delete process.env.CLAUDECODE;
@@ -60,13 +62,19 @@ if (command === 'execute-extractor') {
 )`;
 
     console.log(`⏳ Spawning rnr-extractor...`);
-    // We use npx @anthropic-ai/claude-code with -p flag
-    const escapedPrompt = taskStr.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    // We use spawnSync to completely avoid cmd.exe quote parsing errors.
+    // Replace newlines but we don't need to manually escape double quotes for spawnSync.
+    const escapedPrompt = taskStr.replace(/\n/g, ' ');
     try {
-        execSync(`npx @anthropic-ai/claude-code -p "${escapedPrompt}"`, { stdio: 'pipe' });
+        const result = spawnSync(npxCmd, ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+        if (result.status !== 0) {
+            console.error(`❌ Failed to extract comments: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
+            process.exit(1);
+        }
         console.log(`✅ Extraction complete.`);
     } catch (error) {
         console.error(`❌ Failed to extract comments: ${error.message}`);
+        process.exit(1);
     }
     process.exit(0);
 }
@@ -127,12 +135,17 @@ if (command === 'execute-synthesizer') {
 )`;
 
     console.log(`⏳ Spawning rnr-synthesizer...`);
-    const escapedPrompt = taskStr.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    const escapedPrompt = taskStr.replace(/\n/g, ' ');
     try {
-        execSync(`npx @anthropic-ai/claude-code -p "${escapedPrompt}"`, { stdio: 'pipe' });
+        const result = spawnSync(npxCmd, ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+        if (result.status !== 0) {
+            console.error(`❌ Failed to synthesize style: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
+            process.exit(1);
+        }
         console.log(`✅ Style synthesized.`);
     } catch (error) {
         console.error(`❌ Failed to synthesize style: ${error.message}`);
+        process.exit(1);
     }
     process.exit(0);
 }
@@ -155,14 +168,16 @@ if (command === 'execute-tasks') {
 
     const classifications = JSON.parse(fs.readFileSync(classificationPath, 'utf8'));
 
-    // Helper function to safely escape quotes for bash
+    // Helper function to safely escape quotes without cmd.exe string mangling
     const executeAgent = (taskString) => {
-        // We use npx @anthropic-ai/claude-code with -p flag
-        const escapedPrompt = taskString.replace(/"/g, '\\"').replace(/\n/g, ' ');
+        const escapedPrompt = taskString.replace(/\n/g, ' ');
         try {
             // Using stdio: 'pipe' to suppress loud output from clogging the main orchestrator's context.
-            // We just let it run and catch any errors.
-            execSync(`npx @anthropic-ai/claude-code -p "${escapedPrompt}"`, { stdio: 'pipe' });
+            const result = spawnSync(npxCmd, ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+            if (result.status !== 0) {
+                console.error(`Error executing subagent: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
+                return false;
+            }
             return true;
         } catch (error) {
             console.error(`Error executing subagent: ${error.message}`);

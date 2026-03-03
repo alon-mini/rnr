@@ -1,6 +1,6 @@
 {
     "name": "revise-and-resubmit-cc",
-    "version": "2.1.4",
+    "version": "2.1.5",
     "description": "An automated, agent-based academic revision ecosystem powered by Claude Code.",
     "main": "bin/install.js",
     "bin": {
