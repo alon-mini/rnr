@@ -191,6 +191,9 @@ node bin/install.js --claude --global
 ```
 You can now use `/rnr:update` inside Claude Code going forward.
 
+### Version 2.1.6 Notes
+- **Extractor Quoting Bug Fix**: Fixed a critical string interpolation bug where `--reviewer "NAME"` containing spaces wasn't being correctly escaped inside the generated `Task()` python prompt literal, causing it to prematurely terminate the string and throw an `unknown option '--reviewer'` error in the Claude Code CLI.
+
 ### Version 2.1.5 Notes
 - **Windows Quotation Bug Fix**: Replaced Node's `execSync` with `spawnSync` in `rnr-tools.js` to ensure the complex quotation marks needed for the subagent `Task(...)` structures are natively escaped and passed to `npx claude-code` without being destroyed by `cmd.exe` parsing.
 

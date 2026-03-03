@@ -2,9 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { spawnSync } = require('child_process');
-
-const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+const spawnSync = require('cross-spawn').sync;
 
 // Unset CLAUDECODE to bypass nested session restrictions when spawning subagents
 delete process.env.CLAUDECODE;
@@ -48,7 +46,7 @@ if (command === 'get-grouped-comments') {
 
 if (command === 'execute-extractor') {
     const targetFile = process.argv[3];
-    const reviewer = process.argv[4] ? ` --reviewer "${process.argv[4]}"` : '';
+    const reviewer = process.argv[4] ? ` --reviewer \\"${process.argv[4]}\\"` : '';
 
     if (!targetFile) {
         console.error('Missing target file for extraction.');
@@ -66,7 +64,7 @@ if (command === 'execute-extractor') {
     // Replace newlines but we don't need to manually escape double quotes for spawnSync.
     const escapedPrompt = taskStr.replace(/\n/g, ' ');
     try {
-        const result = spawnSync(npxCmd, ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+        const result = spawnSync('npx', ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
         if (result.status !== 0) {
             console.error(`❌ Failed to extract comments: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
             process.exit(1);
@@ -81,7 +79,7 @@ if (command === 'execute-extractor') {
 
 if (command === 'generate-extract-task') {
     const targetFile = process.argv[3];
-    const reviewer = process.argv[4] ? ` --reviewer "${process.argv[4]}"` : '';
+    const reviewer = process.argv[4] ? ` --reviewer \\"${process.argv[4]}\\"` : '';
 
     if (!targetFile) {
         console.error('Missing target file for extraction.');
@@ -137,7 +135,7 @@ if (command === 'execute-synthesizer') {
     console.log(`⏳ Spawning rnr-synthesizer...`);
     const escapedPrompt = taskStr.replace(/\n/g, ' ');
     try {
-        const result = spawnSync(npxCmd, ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+        const result = spawnSync('npx', ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
         if (result.status !== 0) {
             console.error(`❌ Failed to synthesize style: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
             process.exit(1);
@@ -173,7 +171,7 @@ if (command === 'execute-tasks') {
         const escapedPrompt = taskString.replace(/\n/g, ' ');
         try {
             // Using stdio: 'pipe' to suppress loud output from clogging the main orchestrator's context.
-            const result = spawnSync(npxCmd, ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+            const result = spawnSync('npx', ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
             if (result.status !== 0) {
                 console.error(`Error executing subagent: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
                 return false;
