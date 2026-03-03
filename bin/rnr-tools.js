@@ -64,7 +64,7 @@ if (command === 'execute-extractor') {
     // Replace newlines but we don't need to manually escape double quotes for spawnSync.
     const escapedPrompt = taskStr.replace(/\n/g, ' ');
     try {
-        const result = spawnSync('npx', ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+        const result = spawnSync('npx', ['@anthropic-ai/claude-code', '--dangerously-skip-permissions', '-p', escapedPrompt], { stdio: 'pipe' });
         if (result.status !== 0) {
             console.error(`❌ Failed to extract comments: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
             process.exit(1);
@@ -135,7 +135,7 @@ if (command === 'execute-synthesizer') {
     console.log(`⏳ Spawning rnr-synthesizer...`);
     const escapedPrompt = taskStr.replace(/\n/g, ' ');
     try {
-        const result = spawnSync('npx', ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+        const result = spawnSync('npx', ['@anthropic-ai/claude-code', '--dangerously-skip-permissions', '-p', escapedPrompt], { stdio: 'pipe' });
         if (result.status !== 0) {
             console.error(`❌ Failed to synthesize style: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
             process.exit(1);
@@ -171,7 +171,7 @@ if (command === 'execute-tasks') {
         const escapedPrompt = taskString.replace(/\n/g, ' ');
         try {
             // Using stdio: 'pipe' to suppress loud output from clogging the main orchestrator's context.
-            const result = spawnSync('npx', ['@anthropic-ai/claude-code', '-p', escapedPrompt], { stdio: 'pipe' });
+            const result = spawnSync('npx', ['@anthropic-ai/claude-code', '--dangerously-skip-permissions', '-p', escapedPrompt], { stdio: 'pipe' });
             if (result.status !== 0) {
                 console.error(`Error executing subagent: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
                 return false;
