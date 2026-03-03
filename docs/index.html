@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Revise & Resubmit (R&R)</title>
-    <meta name="description" content="A powerful meta-prompting system for automating academic revisions with Claude Code.">
+    <meta name="description"
+        content="A powerful meta-prompting system for automating academic revisions with Claude Code.">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
 </head>
+
 <body>
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -29,7 +35,9 @@
                 <a href="#commands">Commands</a>
                 <a href="https://github.com/alon-mini/rnr" target="_blank" class="github-btn">
                     <svg height="20" viewBox="0 0 16 16" width="20" fill="currentColor">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+                        </path>
                     </svg>
                     GitHub
                 </a>
@@ -44,10 +52,13 @@
                     <div class="badge">Agentic Revision Automation</div>
                     <h1 class="hero-title">Automate your academic revisions.</h1>
                     <p class="hero-subtitle">
-                        A light-weight and powerful meta-prompting system for tracking comments and rewriting documents directly inside <span class="highlight">Claude Code</span>.
+                        A light-weight and powerful meta-prompting system for tracking comments and rewriting documents
+                        directly inside <span class="highlight">Claude Code</span>.
                     </p>
                     <p class="hero-description">
-                        When reviewers send back a .docx with dozens of comments, don't spend weeks matching context. R&R spawns a specialized team of subagents to extract, research, edit, and perfectly repack your document without formatting rot.
+                        When reviewers send back a .docx with dozens of comments, don't spend weeks matching context.
+                        R&R spawns a specialized team of subagents to extract, research, edit, and perfectly repack your
+                        document without formatting rot.
                     </p>
                     <div class="hero-actions">
                         <div class="code-install">
@@ -55,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="hero-animation-wrapper">
                     <div class="animation-window glass-panel">
                         <div class="window-header">
@@ -76,23 +87,52 @@
                                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                                     </filter>
                                     <filter id="drop-shadow" x="-10%" y="-10%" width="120%" height="120%">
-                                        <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/>
+                                        <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="rgba(0,0,0,0.5)" />
                                     </filter>
-                                    <!-- A pattern for the tile floor -->
-                                    <pattern id="floor-tile" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                                        <rect x="0" y="0" width="40" height="40" fill="#131024" />
-                                        <path d="M40 0L0 0 0 40" fill="none" stroke="#1d1936" stroke-width="1" />
+                                    <pattern id="wood-floor" x="0" y="0" width="40" height="40"
+                                        patternUnits="userSpaceOnUse">
+                                        <rect x="0" y="0" width="40" height="40" fill="#8b5a2b" />
+                                        <path d="M40 0L0 0 0 40 M20 0L20 40" fill="none" stroke="#6b4423"
+                                            stroke-width="1" />
+                                    </pattern>
+                                    <pattern id="white-tile" x="0" y="0" width="30" height="30"
+                                        patternUnits="userSpaceOnUse">
+                                        <rect x="0" y="0" width="30" height="30" fill="#f0f0f0" />
+                                        <path d="M30 0L0 0 0 30" fill="none" stroke="#d1d5db" stroke-width="1" />
+                                    </pattern>
+                                    <pattern id="blue-floor" x="0" y="0" width="40" height="40"
+                                        patternUnits="userSpaceOnUse">
+                                        <rect x="0" y="0" width="40" height="40" fill="#4a7695" />
+                                        <path d="M40 0L0 0 0 40" fill="none" stroke="#375d78" stroke-width="1" />
                                     </pattern>
                                 </defs>
-                                
-                                <rect width="1000" height="650" fill="url(#floor-tile)" />
-                                
+
+                                <g id="floor-layer">
+                                    <rect x="0" y="0" width="1000" height="650" fill="#1b1d2e" /> <!-- Outer walls -->
+                                    <rect x="140" y="0" width="380" height="650" fill="url(#wood-floor)" />
+                                    <!-- Main Room -->
+                                    <!-- A small extension for the entrance/hallway left of the main room -->
+                                    <rect x="520" y="0" width="330" height="260" fill="url(#white-tile)" />
+                                    <!-- Kitchen Room -->
+                                    <rect x="520" y="280" width="330" height="370" fill="url(#blue-floor)" />
+                                    <!-- Lounge Room -->
+
+                                    <!-- Walls -->
+                                    <path
+                                        d="M140 0L140 650 M520 0L520 650 M520 260L850 260 M520 280L850 280 M850 0L850 650"
+                                        fill="none" stroke="#121629" stroke-width="8" />
+                                    <!-- Wall Tops (for depth) -->
+                                    <path
+                                        d="M140 0L140 650 M520 0L520 650 M520 260L850 260 M520 280L850 280 M850 0L850 650"
+                                        fill="none" stroke="#1f2937" stroke-width="4" transform="translate(0, -4)" />
+                                </g>
+
                                 <!-- Static Map Elements (Desks, Machinery) -->
                                 <g id="map-layer"></g> <!-- Populated by JS -->
-                                
+
                                 <!-- Actors (Agents) Layer -->
                                 <g id="actors-layer"></g> <!-- Populated by JS -->
-                                
+
                                 <!-- Items Layout (Documents, pieces) -->
                                 <g id="items-layer"></g> <!-- Populated by JS -->
 
@@ -109,39 +149,47 @@
             <div class="container section-container">
                 <div class="section-header center">
                     <h2 class="section-title">The Subagent Ecosystem</h2>
-                    <p class="section-subtitle">R&R doesn't rely on one massive AI. It uses a highly specialized assembly line of native Claude Code mini-AIs where each agent has exactly one precise job.</p>
+                    <p class="section-subtitle">R&R doesn't rely on one massive AI. It uses a highly specialized
+                        assembly line of native Claude Code mini-AIs where each agent has exactly one precise job.</p>
                 </div>
-                
+
                 <div class="grid-features">
                     <div class="feature-card glass-panel">
                         <div class="feature-icon extractor-bg">📦</div>
                         <h3>The Extractor</h3>
-                        <p>Silently opens your <code>.docx</code>, finds every Reviewer comment and Edit Suggestion, extracts the exact paragraph attached to it, and saves them as isolated Markdown files.</p>
+                        <p>Silently opens your <code>.docx</code>, finds every Reviewer comment and Edit Suggestion,
+                            extracts the exact paragraph attached to it, and saves them as isolated Markdown files.</p>
                     </div>
-                    
+
                     <div class="feature-card glass-panel">
                         <div class="feature-icon processor-bg">⚙️</div>
                         <h3>The Processors</h3>
-                        <p><strong>Isolated & Interlaced.</strong> Dedicated agents spawned for each comment or interwoven cluster. They rewrite the text based strictly on your personal writing style, with empty clean contexts.</p>
+                        <p><strong>Isolated & Interlaced.</strong> Dedicated agents spawned for each comment or
+                            interwoven cluster. They rewrite the text based strictly on your personal writing style,
+                            with empty clean contexts.</p>
                     </div>
 
                     <div class="feature-card glass-panel">
                         <div class="feature-icon researcher-bg">🔍</div>
                         <h3>The Researcher</h3>
-                        <p>If a reviewer asks for a citation, the Processor spawns a Researcher agent which connects to your <strong>NotebookLM</strong>, finds the exact answer, and hands it back.</p>
+                        <p>If a reviewer asks for a citation, the Processor spawns a Researcher agent which connects to
+                            your <strong>NotebookLM</strong>, finds the exact answer, and hands it back.</p>
                     </div>
 
                     <div class="feature-card glass-panel">
                         <div class="feature-icon clarifier-bg">❓</div>
                         <h3>The Clarifier</h3>
-                        <p>Encountered a vague comment? The Clarifier pops up in your terminal to explain the ambiguity and chat with you to figure out exactly what you want the Processor to do.</p>
+                        <p>Encountered a vague comment? The Clarifier pops up in your terminal to explain the ambiguity
+                            and chat with you to figure out exactly what you want the Processor to do.</p>
                     </div>
 
-                    <div class="feature-card glass-panel" style="grid-column: span 1 / span 2; display: flex; flex-direction: row; gap: 2rem; align-items: center; justify-content: center; text-align: left;">
+                    <div class="feature-card glass-panel"
+                        style="grid-column: span 1 / span 2; display: flex; flex-direction: row; gap: 2rem; align-items: center; justify-content: center; text-align: left;">
                         <div class="feature-icon assembler-bg">✨</div>
                         <div>
                             <h3>The Assembler</h3>
-                            <p>Perfectly injects all the revised paragraphs back into a clean, formatted `.docx` file without messing up your citations, graphics, or margins.</p>
+                            <p>Perfectly injects all the revised paragraphs back into a clean, formatted `.docx` file
+                                without messing up your citations, graphics, or margins.</p>
                         </div>
                     </div>
                 </div>
@@ -154,17 +202,23 @@
                     <div class="split-text">
                         <h2 class="section-title">Lean Orchestration</h2>
                         <h3 class="highlight-text">Zero Context Bleeding.</h3>
-                        <p>A major problem with using LLMs for full document revision is "Context Rot." If the AI reads a 50-page document and 100 comments, it will start forgetting instructions, ignoring style guides, and hallucinating facts.</p>
-                        
+                        <p>A major problem with using LLMs for full document revision is "Context Rot." If the AI reads
+                            a 50-page document and 100 comments, it will start forgetting instructions, ignoring style
+                            guides, and hallucinating facts.</p>
+
                         <ul class="check-list">
-                            <li><strong>Blind Orchestrator:</strong> The main coordinator never reads your manuscript. It just runs the workflow.</li>
-                            <li><strong>Native File Blocks:</strong> Subagents use native <code>&lt;files_to_read&gt;</code> blocks to ingest specific bits of context.</li>
-                            <li><strong>Fresh Context:</strong> Each edit happens in a completely fresh context window focused 100% on the single active comment.</li>
-                            <li><strong>XML Directed:</strong> Every agent is structured XML optimized specifically for Claude.</li>
+                            <li><strong>Blind Orchestrator:</strong> The main coordinator never reads your manuscript.
+                                It just runs the workflow.</li>
+                            <li><strong>Native File Blocks:</strong> Subagents use native
+                                <code>&lt;files_to_read&gt;</code> blocks to ingest specific bits of context.</li>
+                            <li><strong>Fresh Context:</strong> Each edit happens in a completely fresh context window
+                                focused 100% on the single active comment.</li>
+                            <li><strong>XML Directed:</strong> Every agent is structured XML optimized specifically for
+                                Claude.</li>
                         </ul>
                     </div>
                     <div class="split-image glass-panel code-snippet">
-<pre><code class="language-xml">&lt;classification type="needs_context"&gt;
+                        <pre><code class="language-xml">&lt;classification type="needs_context"&gt;
   &lt;reasoning&gt;
     The reviewer asks us to cite the 
     2023 review by Johnson et al. 
@@ -185,29 +239,35 @@
             <div class="container section-container">
                 <div class="section-header center">
                     <h2 class="section-title">The Workflow Commands</h2>
-                    <p class="section-subtitle">Simple `/rnr` commands built directly into your Claude Code terminal.</p>
+                    <p class="section-subtitle">Simple `/rnr` commands built directly into your Claude Code terminal.
+                    </p>
                 </div>
-                
+
                 <div class="commands-list">
                     <div class="command-row glass-panel">
                         <div class="cmd-code"><code>/rnr:init</code></div>
-                        <div class="cmd-desc">Installs the parser and assembler scripts to a `.rnr/` folder in the current directory workspace.</div>
+                        <div class="cmd-desc">Installs the parser and assembler scripts to a `.rnr/` folder in the
+                            current directory workspace.</div>
                     </div>
                     <div class="command-row glass-panel">
                         <div class="cmd-code"><code>/rnr:extract-comments &lt;file&gt;</code></div>
-                        <div class="cmd-desc">Unpacks the `.docx` into XML and extracts Reviewer 1/2 comments as individual isolated files.</div>
+                        <div class="cmd-desc">Unpacks the `.docx` into XML and extracts Reviewer 1/2 comments as
+                            individual isolated files.</div>
                     </div>
                     <div class="command-row glass-panel">
                         <div class="cmd-code"><code>/rnr:synthesize-style</code></div>
-                        <div class="cmd-desc">Crawls your manuscript to construct a custom <code>style_skill.md</code> from your vocabulary and tone.</div>
+                        <div class="cmd-desc">Crawls your manuscript to construct a custom <code>style_skill.md</code>
+                            from your vocabulary and tone.</div>
                     </div>
                     <div class="command-row glass-panel">
                         <div class="cmd-code"><code>/rnr:process-comments</code></div>
-                        <div class="cmd-desc">The main engine. Iterates through each comment, spawning subagents and prompting for human context when needed.</div>
+                        <div class="cmd-desc">The main engine. Iterates through each comment, spawning subagents and
+                            prompting for human context when needed.</div>
                     </div>
                     <div class="command-row glass-panel">
                         <div class="cmd-code"><code>/rnr:assemble &lt;output&gt;</code></div>
-                        <div class="cmd-desc">Repacks all revised XML nodes flawlessly into a fresh, valid `.docx` ready for submission.</div>
+                        <div class="cmd-desc">Repacks all revised XML nodes flawlessly into a fresh, valid `.docx` ready
+                            for submission.</div>
                     </div>
                 </div>
             </div>
@@ -225,4 +285,5 @@
     <!-- Script that powers the elaborate SVG scene -->
     <script src="script.js"></script>
 </body>
+
 </html>

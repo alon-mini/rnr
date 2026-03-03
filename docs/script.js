@@ -12,106 +12,401 @@ const actorsLayer = document.getElementById('actors-layer');
 const bubblesLayer = document.getElementById('bubbles-layer');
 
 const COLORS = {
-    'e': '#10b981', // Extractor
-    'p': '#f59e0b', // Processor
-    'r': '#8b5cf6', // Researcher
-    'c': '#ef4444', // Clarifier
-    'a': '#ec4899', // Assembler
-    'o': '#3b82f6', // Orchestrator
-    'w': '#ffffff', // White
-    'k': '#000000', // Black
-    'd': '#1e1b4b', // Dark
-    'g': '#94a3b8', // Grey
-    's': '#ffcc80', // Skin
-    't': '#0f172a', // Terminal background
-    'x': null       // Transparent
+    'x': null,
+    'k': '#1a1a1a', // black
+    'w': '#ffffff', // white
+    'r': '#d03e3e', // red
+    'b': '#2c5e9e', // blue
+    'n': '#5c3a21', // brown hair
+    'l': '#e6c229', // blond hair
+    's': '#fcd2b3', // light skin
+    'c': '#8d5524', // dark skin
+    'd': '#333333', // dark grey (shirts/pants)
+    'g': '#94a3b8', // grey
+    'p': '#d27d96', // pink/magenta
+    'u': '#111827'  // very dark blue/black
 };
 
 // 16x16 pixel sprites
 const spriteMap = {
-    bot: [
+    proc1: [ // spiky brown hair, white shirt
+        "xxxkknnnkxxxxxxx",
+        "xxknnnnnnkxxxxxx",
+        "xxkksnnnskkxxxxx",
+        "xxkskwkckxxxxxxx", // c is skin shade
+        "xxkssssskxxxxxxx",
+        "xxxkwwwkxxxxxxxx",
+        "xxkwwwwwkxxxxxxx",
+        "xxkwwwwwkxxxxxxx",
+        "xxxkwwwkxxxxxxxx",
+        "xxxkdddkxxxxxxxx",
+        "xxxkdddkxxxxxxxx",
+        "xxxbbxbbxxxxxxxx",
+        "xxxkkxkkxxxxxxxx",
         "xxxxxxxxxxxxxxxx",
         "xxxxxxxxxxxxxxxx",
-        "xxxxxbbbbbbxxxxx",
-        "xxxxbbbbbbbbxxxx",
-        "xxxbbwkbwkwbbxxx",
-        "xxxbbwwwwwwbbxxx",
-        "xxxxbbbbbbbbxxxx",
-        "xxxxxbbbbbbxxxxx",
-        "xxxbb.bbbb.bbxxx",
-        "xxbb..bbbb..bbxx",
-        "xxbb..bbbb..bbxx",
-        "xxxxxxbbbbxxxxxx",
-        "xxxxxxbxxbxxxxxx",
-        "xxxxxbbxxbbxxxxx",
-        "xxxxxbbxxbbxxxxx",
+        "xxxxxxxxxxxxxxxx"
+    ],
+    proc2: [ // blond, dark blue shirt with white
+        "xxxkklllkxxxxxxx",
+        "xxkllllllkxxxxxx",
+        "xxkksnnnskkxxxxx",
+        "xxkskwkskxxxxxxx",
+        "xxkssssskxxxxxxx",
+        "xxxkbbbkxxxxxxxx",
+        "xxkbbbbbkxxxxxxx",
+        "xxkbbbbbkxxxxxxx",
+        "xxkwbbbwkxxxxxxx",
+        "xxxkbbbkxxxxxxxx",
+        "xxxkdddkxxxxxxxx",
+        "xxxkdddkxxxxxxxx",
+        "xxxkkxkkxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx"
+    ],
+    orchestrator: [ // black hair girl, red shirt
+        "xxxkkkkkxxxxxxxx",
+        "xxkkkkkkkxxxxxxx",
+        "xxkksnnnskkxxxxx",
+        "xxkskwkskxxxxxxx",
+        "xxkssssskxxxxxxx",
+        "xxxkrrrkxxxxxxxx",
+        "xxkrrrrrkxxxxxxx",
+        "xxkrrrrrkxxxxxxx",
+        "xxxkrrrkxxxxxxxx",
+        "xxxkdddkxxxxxxxx",
+        "xxxkdddkxxxxxxxx",
+        "xxxxsxsxxxxxxxxx",
+        "xxxnnxnnxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx"
+    ],
+    extractor: [ // afro guy, red shirt
+        "xxkkkkkkkxxxxxxx",
+        "xkkkkkkkkkxxxxxx",
+        "xkkccccckkxxxxxx",
+        "xkcclkcwkcxxxxxx",
+        "xkcccccccxxxxxxx",
+        "xxxkrrrkxxxxxxxx",
+        "xxkrrrrrkxxxxxxx",
+        "xxkrrrrrkxxxxxxx",
+        "xxxkrrrkxxxxxxxx",
+        "xxxkbbbkxxxxxxxx",
+        "xxxkbbbkxxxxxxxx",
+        "xxxbbxbbxxxxxxxx",
+        "xxxkkxkkxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx"
+    ],
+    clarifier: [ // blonde girl sitting
+        "xxxkklllkxxxxxxx",
+        "xxkllllllkxxxxxx",
+        "xxkksnnnskkxxxxx",
+        "xxkskwkskxxxxxxx",
+        "xxkssssskxxxxxxx",
+        "xxxkdddkxxxxxxxx",
+        "xxkdddddkxxxxxxx",
+        "xxkddddddkxxxxxx",
+        "xxxkddddkxxxxxxx",
+        "xxxxskssxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx"
+    ],
+    researcher: [ // white hair guy sitting
+        "xxxkkwwwkxxxxxxx",
+        "xxkwwwwwwkxxxxxx",
+        "xxkksnnnskkxxxxx",
+        "xxkskwkskxxxxxxx",
+        "xxkssssskxxxxxxx",
+        "xxxkwwwkxxxxxxxx",
+        "xxkwwwwwkxxxxxxx",
+        "xxkwwwwwkxxxxxxx",
+        "xxxkwwwwkxxxxxxx",
+        "xxxxskssxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx"
+    ],
+    assembler: [ // generic bot/helper for assembler
+        "xxxxxxxxxxxxxxxx",
+        "xxxkkkkkkxxxxxxx",
+        "xxkkbbbbkkxxxxxx",
+        "xxkbwwwwbkxxxxxx",
+        "xxkbbbbbbkxxxxxx",
+        "xxxkkkkkkxxxxxxx",
+        "xxkkggggkkxxxxxx",
+        "xkkggggggkkxxxxx",
+        "xkkggggggkkxxxxx",
+        "xxxxddddxxxxxxxx",
+        "xxxxddddxxxxxxxx",
+        "xxxbbxxbbxxxxxxx",
+        "xxxkkxxkkxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
         "xxxxxxxxxxxxxxxx"
     ]
 };
 
-function drawSprite(templateName, baseColor, x, y, scale = 3) {
+function drawSprite(templateName, x, y, scale = 2.5) {
     const group = el('g', { transform: `translate(${x}, ${y})` });
     const lines = spriteMap[templateName];
 
-    // We color the dynamic 'b' pixels using baseColor
     lines.forEach((line, row) => {
         for (let col = 0; col < line.length; col++) {
             const char = line[col];
             if (char === 'x') continue;
 
             let fill = COLORS[char];
-            if (char === 'b') fill = baseColor;
 
             const rect = el('rect', {
-                x: col * scale,
-                y: row * scale,
-                width: scale * 1.05, // slight overlap to prevent bleeding in SVG rendering
-                height: scale * 1.05,
+                x: col * scale - (16 * scale / 2),
+                y: row * scale - (16 * scale), // anchor at bottom center
+                width: scale + 0.5,
+                height: scale + 0.5,
                 fill: fill,
                 'shape-rendering': 'crispEdges'
             });
             group.appendChild(rect);
         }
     });
+
+    // Add a small drop shadow ellipse under the character
+    const shadow = el('ellipse', { cx: 0, cy: 0, rx: 8, ry: 3, fill: 'rgba(0,0,0,0.3)' });
+    group.insertBefore(shadow, group.firstChild);
+
     return group;
 }
 
-// Function to draw a cubicle/desk
-function drawDesk(x, y, labelText, colorCode) {
+// Scenery Generators
+function drawDesk(x, y, labelText, type = 'up') {
     const group = el('g', { transform: `translate(${x}, ${y})` });
 
-    // Rug
-    group.appendChild(el('rect', { x: -20, y: -20, width: 140, height: 100, fill: '#1e1b4b', rx: 10, opacity: 0.5 }));
-    group.appendChild(el('rect', { x: -20, y: -20, width: 140, height: 100, fill: 'none', stroke: COLORS[colorCode], 'stroke-width': 2, 'stroke-dasharray': '5,5', rx: 10, opacity: 0.3 }));
+    // Wooden desk pixel art style
+    group.appendChild(el('rect', { x: -35, y: -20, width: 70, height: 40, fill: '#ba7941', rx: 2 }));
+    group.appendChild(el('rect', { x: -35, y: -20, width: 70, height: 40, fill: 'none', stroke: '#8c5020', 'stroke-width': 3, rx: 2 }));
+    group.appendChild(el('rect', { x: -35, y: 17, width: 70, height: 3, fill: '#6e3c15' })); // bottom lip
 
-    // Desk surface
-    group.appendChild(el('rect', { x: 0, y: 15, width: 100, height: 35, fill: '#334155', rx: 4 }));
-    group.appendChild(el('rect', { x: 0, y: 10, width: 100, height: 8, fill: '#475569', rx: 4 }));
+    // Monitor
+    if (type === 'up') {
+        group.appendChild(el('rect', { x: -12, y: -15, width: 24, height: 18, fill: '#cbd5e1', rx: 2 }));
+        group.appendChild(el('rect', { x: -10, y: -13, width: 20, height: 14, fill: '#1e293b', class: 'screen', id: `screen-${labelText.replace(/\s+/g, '-')}` }));
+        group.appendChild(el('rect', { x: -12, y: -15, width: 24, height: 18, fill: 'none', stroke: '#64748b', 'stroke-width': 2, rx: 2 }));
+    } else {
+        group.appendChild(el('rect', { x: -12, y: -5, width: 24, height: 18, fill: '#cbd5e1', rx: 2 }));
+        group.appendChild(el('rect', { x: -10, y: -3, width: 20, height: 14, fill: '#1e293b', class: 'screen', id: `screen-${labelText.replace(/\s+/g, '-')}` }));
+        group.appendChild(el('rect', { x: -12, y: -5, width: 24, height: 18, fill: 'none', stroke: '#64748b', 'stroke-width': 2, rx: 2 }));
+    }
 
-    // Computer monitor
-    group.appendChild(el('rect', { x: 30, y: -15, width: 40, height: 28, fill: '#0f172a', rx: 2 }));
-    group.appendChild(el('rect', { x: 32, y: -13, width: 36, height: 24, fill: '#1e293b', rx: 1, class: 'screen', id: `screen-${labelText.replace(/\s+/g, '-')}` }));
-    // Stand
-    group.appendChild(el('rect', { x: 45, y: 13, width: 10, height: 10, fill: '#64748b' }));
-
-    // Keyboard
-    group.appendChild(el('rect', { x: 30, y: 30, width: 40, height: 10, fill: '#1e293b', rx: 2 }));
+    // Coffee mug & papers
+    group.appendChild(el('rect', { x: 18, y: -8, width: 6, height: 8, fill: '#ffffff', rx: 1 }));
+    group.appendChild(el('rect', { x: -28, y: -5, width: 12, height: 15, fill: '#f8fafc', rx: 1 }));
+    group.appendChild(el('line', { x1: -26, y1: -2, x2: -18, y2: -2, stroke: '#94a3b8', 'stroke-width': 1 }));
+    group.appendChild(el('line', { x1: -26, y1: 2, x2: -18, y2: 2, stroke: '#94a3b8', 'stroke-width': 1 }));
 
     // Label
-    const text = el('text', { x: 50, y: 70, fill: '#94a3b8', 'font-size': '12', 'font-family': 'monospace', 'text-anchor': 'middle' });
+    const text = el('text', { x: 0, y: 35, fill: '#94a3b8', 'font-size': '10', 'font-family': 'monospace', 'text-anchor': 'middle' });
     text.textContent = labelText;
     group.appendChild(text);
 
+    // Stool
+    if (type === 'up') {
+        group.appendChild(el('ellipse', { cx: 0, cy: 30, rx: 10, ry: 7, fill: '#e6c229', stroke: '#c09b11', 'stroke-width': 2 }));
+    } else {
+        group.appendChild(el('ellipse', { cx: 0, cy: -30, rx: 10, ry: 7, fill: '#e6c229', stroke: '#c09b11', 'stroke-width': 2 }));
+    }
+
     return group;
 }
 
-// Draw Document Node
+function drawBookshelf(x, y, width = 60) {
+    const group = el('g', { transform: `translate(${x}, ${y})` });
+    group.appendChild(el('rect', { x: -width / 2, y: -15, width: width, height: 30, fill: '#a26233', stroke: '#5e3415', 'stroke-width': 3 }));
+    group.appendChild(el('line', { x1: -width / 2 + 2, y1: 0, x2: width / 2 - 2, y2: 0, stroke: '#5e3415', 'stroke-width': 3 }));
+
+    // Books
+    const colors = ['#d03e3e', '#2c5e9e', '#e6c229', '#ffffff', '#94a3b8'];
+    for (let i = 0; i < 8; i++) {
+        const bx = -width / 2 + 5 + i * 6;
+        if (Math.random() > 0.3) {
+            group.appendChild(el('rect', { x: bx, y: -12, width: 4, height: 10, fill: colors[Math.floor(Math.random() * colors.length)] }));
+        }
+        if (Math.random() > 0.3) {
+            group.appendChild(el('rect', { x: bx, y: 3, width: 4, height: 10, fill: colors[Math.floor(Math.random() * colors.length)] }));
+        }
+    }
+    return group;
+}
+
+function drawPlant(x, y) {
+    const group = el('g', { transform: `translate(${x}, ${y})` });
+    group.appendChild(el('rect', { x: -8, y: 5, width: 16, height: 12, fill: '#c28b5e', stroke: '#8c5020', 'stroke-width': 2, rx: 2 }));
+    group.appendChild(el('path', { d: "M0,5 Q-15,-10 0,-20 Q15,-10 0,5", fill: '#4ade80', stroke: '#16a34a', 'stroke-width': 2 }));
+    group.appendChild(el('path', { d: "M-4,5 Q-20,-5 -15,-15 Q0,-10 -4,5", fill: '#4ade80', stroke: '#16a34a', 'stroke-width': 2 }));
+    group.appendChild(el('path', { d: "M4,5 Q20,-5 15,-15 Q0,-10 4,5", fill: '#4ade80', stroke: '#16a34a', 'stroke-width': 2 }));
+    return group;
+}
+
+function drawBoxes(x, y) {
+    const group = el('g', { transform: `translate(${x}, ${y})` });
+    group.appendChild(el('rect', { x: -15, y: -10, width: 20, height: 20, fill: '#d9a05b', stroke: '#8c5020', 'stroke-width': 2 }));
+    group.appendChild(el('rect', { x: -5, y: -20, width: 20, height: 20, fill: '#d9a05b', stroke: '#8c5020', 'stroke-width': 2 }));
+    group.appendChild(el('rect', { x: 5, y: -5, width: 22, height: 15, fill: '#d9a05b', stroke: '#8c5020', 'stroke-width': 2 }));
+    // Tape
+    group.appendChild(el('line', { x1: -15, y1: 0, x2: 5, y2: 0, stroke: '#facc15', 'stroke-width': 2 }));
+    group.appendChild(el('line', { x1: -5, y1: -10, x2: 15, y2: -10, stroke: '#facc15', 'stroke-width': 2 }));
+    return group;
+}
+
+function drawVendingMachine(x, y) {
+    const group = el('g', { transform: `translate(${x}, ${y})` });
+    group.appendChild(el('rect', { x: -20, y: -35, width: 40, height: 70, fill: '#e2e8f0', stroke: '#94a3b8', 'stroke-width': 3 }));
+    group.appendChild(el('rect', { x: -14, y: -28, width: 28, height: 45, fill: '#1e293b', stroke: '#334155', 'stroke-width': 2 }));
+    // Drinks
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+            group.appendChild(el('rect', { x: -10 + c * 9, y: -24 + r * 15, width: 5, height: 8, fill: r % 2 == 0 ? '#ef4444' : '#3b82f6' }));
+        }
+    }
+    group.appendChild(el('rect', { x: -14, y: 22, width: 28, height: 8, fill: '#0f172a' })); // dispense slot
+    return group;
+}
+
+function drawWaterCooler(x, y) {
+    const group = el('g', { transform: `translate(${x}, ${y})` });
+    group.appendChild(el('rect', { x: -10, y: -5, width: 20, height: 35, fill: '#f8fafc', stroke: '#94a3b8', 'stroke-width': 2 }));
+    // Jug
+    group.appendChild(el('rect', { x: -8, y: -25, width: 16, height: 20, fill: 'rgba(56, 189, 248, 0.5)', stroke: '#38bdf8', 'stroke-width': 2, rx: 4 }));
+    return group;
+}
+
+function drawKitchenCounter(x, y) {
+    const group = el('g', { transform: `translate(${x}, ${y})` });
+    group.appendChild(el('rect', { x: -40, y: -15, width: 80, height: 30, fill: '#f1f5f9', stroke: '#cbd5e1', 'stroke-width': 3 }));
+    group.appendChild(el('rect', { x: -35, y: -10, width: 25, height: 20, fill: '#e2e8f0', stroke: '#94a3b8', 'stroke-width': 2 })); // sink
+    group.appendChild(el('circle', { cx: -22.5, cy: -10, r: 2, fill: '#64748b' })); // faucet base
+    return group;
+}
+
+function drawFridge(x, y) {
+    const group = el('g', { transform: `translate(${x}, ${y})` });
+    group.appendChild(el('rect', { x: -15, y: -30, width: 30, height: 60, fill: '#f8fafc', stroke: '#94a3b8', 'stroke-width': 3 }));
+    group.appendChild(el('line', { x1: -15, y1: -5, x2: 15, y2: -5, stroke: '#94a3b8', 'stroke-width': 3 })); // freezer split
+    group.appendChild(el('line', { x1: -10, y1: -20, x2: -10, y2: -12, stroke: '#cbd5e1', 'stroke-width': 2 })); // handle 1
+    group.appendChild(el('line', { x1: -10, y1: 5, x2: -10, y2: 15, stroke: '#cbd5e1', 'stroke-width': 2 })); // handle 2
+    return group;
+}
+
+function drawLounge(x, y) {
+    const group = el('g', { transform: `translate(${x}, ${y})` });
+    // Left couch (pink)
+    group.appendChild(el('rect', { x: -45, y: -20, width: 20, height: 40, fill: '#e879f9', stroke: '#c026d3', 'stroke-width': 2, rx: 3 }));
+    // Right couch (pink)
+    group.appendChild(el('rect', { x: 25, y: -20, width: 20, height: 40, fill: '#e879f9', stroke: '#c026d3', 'stroke-width': 2, rx: 3 }));
+    // Coffee table
+    group.appendChild(el('rect', { x: -15, y: -15, width: 30, height: 30, fill: '#d9a05b', stroke: '#8c5020', 'stroke-width': 3, rx: 2 }));
+    // Mugs on table
+    group.appendChild(el('rect', { x: -5, y: -5, width: 5, height: 6, fill: '#ffffff' }));
+    group.appendChild(el('rect', { x: 5, y: 2, width: 5, height: 6, fill: '#ffffff' }));
+
+    // Picture on wall
+    group.appendChild(el('rect', { x: -25, y: -60, width: 50, height: 25, fill: '#8b5cf6', stroke: '#d9a05b', 'stroke-width': 4 }));
+    group.appendChild(el('circle', { cx: -10, cy: -55, r: 4, fill: '#facc15' })); // sun
+    group.appendChild(el('path', { d: "M-25,-40 L-10,-50 L5,-40 L15,-45 L25,-40 L25,-35 L-25,-35 Z", fill: '#4ade80' })); // mountains
+
+    return group;
+}
+
+const LOCS = {
+    // Left Room (Main Office)
+    extractor: { x: 300, y: 150 }, // top left desk
+    proc2: { x: 300, y: 350 },     // bottom left desk
+    proc1: { x: 450, y: 150 },     // top right desk
+    assembler: { x: 450, y: 350 }, // bottom right desk
+    inbox: { x: 200, y: 250 },     // Orchestrator starts around here walking
+
+    // Top right (Kitchen)
+    outbox: { x: 670, y: 150 },    // the final destination, acts as "inbox" of requests maybe
+    kitchenCenter: { x: 670, y: 150 },
+
+    // Bottom right (Lounge)
+    researcher: { x: 690, y: 460 }, // right side of lounge table
+    clarifier: { x: 630, y: 460 },  // left side of lounge table
+};
+
+// --- DRAW SCENERY ---
+// Main room props
+mapLayer.appendChild(drawBookshelf(250, 40, 80));
+mapLayer.appendChild(drawBookshelf(450, 40, 80));
+mapLayer.appendChild(drawBoxes(250, 80));
+mapLayer.appendChild(drawPlant(200, 80));
+mapLayer.appendChild(drawPlant(200, 450));
+mapLayer.appendChild(drawPlant(500, 450));
+
+// Kitchen
+mapLayer.appendChild(drawVendingMachine(560, 60));
+mapLayer.appendChild(drawWaterCooler(620, 75));
+mapLayer.appendChild(drawKitchenCounter(720, 65));
+mapLayer.appendChild(drawFridge(790, 60));
+mapLayer.appendChild(el('circle', { cx: 680, cy: 30, r: 10, fill: '#f8fafc', stroke: '#94a3b8', 'stroke-width': 2 })); // wall clock
+mapLayer.appendChild(el('line', { x1: 680, y1: 30, x2: 680, y2: 24, stroke: '#334155', 'stroke-width': 2 })); // clock hand
+
+// Lounge
+mapLayer.appendChild(drawBookshelf(580, 310, 60));
+mapLayer.appendChild(drawBookshelf(800, 310, 60));
+mapLayer.appendChild(drawPlant(650, 310));
+mapLayer.appendChild(drawPlant(740, 310));
+mapLayer.appendChild(drawPlant(550, 500));
+mapLayer.appendChild(drawPlant(820, 500));
+mapLayer.appendChild(drawLounge(660, 460));
+
+
+// Draw Desks
+mapLayer.appendChild(drawDesk(LOCS.extractor.x, LOCS.extractor.y, 'rnr-extractor', 'up'));
+mapLayer.appendChild(drawDesk(LOCS.proc1.x, LOCS.proc1.y, 'rnr-proc-1', 'up'));
+mapLayer.appendChild(drawDesk(LOCS.proc2.x, LOCS.proc2.y, 'rnr-proc-2', 'down'));
+mapLayer.appendChild(drawDesk(LOCS.assembler.x, LOCS.assembler.y, 'rnr-assembler', 'down'));
+
+// --- ACTORS ---
+const orchestrator = drawSprite('orchestrator', LOCS.inbox.x, LOCS.inbox.y);
+actorsLayer.appendChild(orchestrator);
+
+// Processors at top desks
+const extractor = drawSprite('extractor', LOCS.extractor.x, LOCS.extractor.y + 15);
+actorsLayer.appendChild(extractor);
+
+const proc1 = drawSprite('proc1', LOCS.proc1.x, LOCS.proc1.y + 15);
+actorsLayer.appendChild(proc1);
+
+// Processors at bottom desks (facing up)
+const proc2 = drawSprite('proc2', LOCS.proc2.x, LOCS.proc2.y - 15);
+actorsLayer.appendChild(proc2);
+
+const assembler = drawSprite('assembler', LOCS.assembler.x, LOCS.assembler.y - 15);
+actorsLayer.appendChild(assembler);
+
+// Lounge chars
+const clarifier = drawSprite('clarifier', LOCS.clarifier.x, LOCS.clarifier.y + 5);
+actorsLayer.appendChild(clarifier);
+const researcher = drawSprite('researcher', LOCS.researcher.x, LOCS.researcher.y + 5);
+actorsLayer.appendChild(researcher);
+
+
 function drawDocument(x, y, isSmall = false, isGold = false) {
     const group = el('g', { transform: `translate(${x}, ${y})`, class: 'document' });
     const w = isSmall ? 25 : 40;
     const h = isSmall ? 35 : 56;
 
-    const doc = el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, fill: isGold ? '#fbbf24' : '#e2e8f0', rx: 3, filter: 'url(#drop-shadow)' });
+    const doc = el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, fill: isGold ? '#facc15' : '#f8fafc', rx: 2, filter: 'url(#drop-shadow)' });
     group.appendChild(doc);
 
     // lines
@@ -121,13 +416,6 @@ function drawDocument(x, y, isSmall = false, isGold = false) {
     for (let i = 0; i < (isSmall ? 3 : 5); i++) {
         group.appendChild(el('rect', { x: lineX, y: -h / 2 + 10 + i * 8, width: lineW * (i % 2 == 0 ? 1 : 0.7), height: 3, fill: lineC, rx: 1 }));
     }
-
-    if (!isGold) {
-        // Doc symbol
-        const tag = el('rect', { x: -w / 2 + 4, y: -h / 2 + 4, width: w / 3, height: w / 3, fill: '#3b82f6', rx: 2 });
-        group.appendChild(tag);
-    }
-
     return group;
 }
 
@@ -158,64 +446,10 @@ function createSpeechBubble(x, y, textList, type = 'normal') {
 }
 
 
-// --- SCENE SETUP --- //
-
-// Map layout
-const LOCS = {
-    start: { x: 50, y: 150 },
-    inbox: { x: 50, y: 150 },
-    extractor: { x: 250, y: 100 },
-    proc1: { x: 500, y: 200 },
-    proc2: { x: 500, y: 350 },
-    researcher: { x: 200, y: 350 },
-    clarifier: { x: 200, y: 500 },
-    assembler: { x: 750, y: 280 },
-    outbox: { x: 900, y: 280 }, // output dock
-};
-
-// Draw Map
-mapLayer.appendChild(drawDesk(LOCS.extractor.x, LOCS.extractor.y, 'rnr-extractor', 'e'));
-mapLayer.appendChild(drawDesk(LOCS.proc1.x, LOCS.proc1.y, 'rnr-processor (1)', 'p'));
-mapLayer.appendChild(drawDesk(LOCS.proc2.x, LOCS.proc2.y, 'rnr-processor (2)', 'p'));
-mapLayer.appendChild(drawDesk(LOCS.researcher.x, LOCS.researcher.y, 'rnr-researcher', 'r'));
-mapLayer.appendChild(drawDesk(LOCS.clarifier.x, LOCS.clarifier.y, 'rnr-clarifier', 'c'));
-mapLayer.appendChild(drawDesk(LOCS.assembler.x, LOCS.assembler.y, 'rnr-assembler', 'a'));
-
-// Draw Inbox/Outbox pedestals
-mapLayer.appendChild(el('rect', { x: LOCS.inbox.x - 30, y: LOCS.inbox.y - 20, width: 60, height: 60, fill: '#1e293b', rx: 5, stroke: '#334155' }));
-mapLayer.appendChild(el('text', { x: LOCS.inbox.x, y: LOCS.inbox.y + 55, fill: '#64748b', 'font-size': '10', 'text-anchor': 'middle' }).appendChild(document.createTextNode('INBOX')).parentNode);
-
-mapLayer.appendChild(el('rect', { x: LOCS.outbox.x - 30, y: LOCS.outbox.y - 20, width: 60, height: 60, fill: '#1e293b', rx: 5, stroke: '#3b82f6', 'stroke-width': 2 }));
-mapLayer.appendChild(el('text', { x: LOCS.outbox.x, y: LOCS.outbox.y + 55, fill: '#3b82f6', 'font-size': '10', 'text-anchor': 'middle', 'font-weight': 'bold' }).appendChild(document.createTextNode('FINAL.docx')).parentNode);
-
-// Create Actors
-const orchestrator = drawSprite('bot', COLORS['o'], LOCS.inbox.x, LOCS.inbox.y - 30);
-actorsLayer.appendChild(orchestrator);
-
-const extractor = drawSprite('bot', COLORS['e'], LOCS.extractor.x + 50, LOCS.extractor.y + 40);
-actorsLayer.appendChild(extractor);
-
-const proc1 = drawSprite('bot', COLORS['p'], LOCS.proc1.x + 50, LOCS.proc1.y + 40);
-actorsLayer.appendChild(proc1);
-
-const proc2 = drawSprite('bot', COLORS['p'], LOCS.proc2.x + 50, LOCS.proc2.y + 40);
-actorsLayer.appendChild(proc2);
-
-const researcher = drawSprite('bot', COLORS['r'], LOCS.researcher.x + 50, LOCS.researcher.y + 40);
-actorsLayer.appendChild(researcher);
-
-const clarifier = drawSprite('bot', COLORS['c'], LOCS.clarifier.x + 50, LOCS.clarifier.y + 40);
-actorsLayer.appendChild(clarifier);
-
-const assembler = drawSprite('bot', COLORS['a'], LOCS.assembler.x + 50, LOCS.assembler.y + 40);
-actorsLayer.appendChild(assembler);
-
-
-// Create Items
+// --- DOC ITEMS ---
 const mainDoc = drawDocument(LOCS.inbox.x, LOCS.inbox.y);
 itemsLayer.appendChild(mainDoc);
 
-// Three pieces created when Extractor acts
 const piece1 = drawDocument(LOCS.extractor.x, LOCS.extractor.y, true);
 const piece2 = drawDocument(LOCS.extractor.x, LOCS.extractor.y, true);
 const piece3 = drawDocument(LOCS.extractor.x, LOCS.extractor.y, true);
@@ -224,15 +458,13 @@ itemsLayer.appendChild(piece1);
 itemsLayer.appendChild(piece2);
 itemsLayer.appendChild(piece3);
 
-const finalDoc = drawDocument(LOCS.assembler.x, LOCS.assembler.y, false, true);
+const finalDoc = drawDocument(LOCS.kitchenCenter.x, LOCS.kitchenCenter.y, false, true);
 gsap.set(finalDoc, { opacity: 0 });
 itemsLayer.appendChild(finalDoc);
 
 // --- ANIMATION TIMELINE --- //
-
 const tl = gsap.timeline({ repeat: -1, repeatDelay: 2, defaults: { ease: "power2.inOut" } });
 
-// Utility to bounce character while walking
 function walkAnim(target, duration, vars) {
     const wl = gsap.timeline();
     wl.to(target, { duration: duration, ...vars }, 0);
@@ -240,82 +472,81 @@ function walkAnim(target, duration, vars) {
     return wl;
 }
 
-// 1. Orchestrator picks up document
-tl.add(createSpeechBubble(LOCS.inbox.x, LOCS.inbox.y - 50, "/rnr:process").group, 0)
+// 1. Orchestrator takes main doc to extractor
+tl.add(createSpeechBubble(LOCS.inbox.x, LOCS.inbox.y - 30, "/rnr:process").group, 0)
     .to(bubblesLayer.lastChild, { opacity: 1, duration: 0.3 }, "+=0.2")
     .to(bubblesLayer.lastChild, { opacity: 0, duration: 0.3 }, "+=1.5");
 
-tl.to(mainDoc, { y: LOCS.inbox.y - 30, duration: 0.3 })
-    .add(walkAnim(orchestrator, 1.5, { x: LOCS.extractor.x + 20, y: LOCS.extractor.y + 10 }))
-    .to(mainDoc, { x: LOCS.extractor.x, y: LOCS.extractor.y, duration: 1.5 }, "-=1.5"); // Carry doc
+tl.to(mainDoc, { y: "-=20", duration: 0.3 })
+    .add(walkAnim(orchestrator, 2, { x: LOCS.extractor.x - 30, y: LOCS.extractor.y + 10 }))
+    .to(mainDoc, { x: LOCS.extractor.x - 10, y: LOCS.extractor.y, duration: 2 }, "-=2");
 
 // 2. Extractor breaks down
-const exBubb = createSpeechBubble(LOCS.extractor.x + 50, LOCS.extractor.y, "Extracting XML...", "terminal");
+const exBubb = createSpeechBubble(LOCS.extractor.x + 40, LOCS.extractor.y - 10, "Extracting...", "terminal");
 tl.to(exBubb.group, { opacity: 1, y: "-=10", duration: 0.3 })
-    .to(extractor, { y: "-=10", yoyo: true, repeat: 5, duration: 0.1 }, "+=0")
+    .to(extractor, { y: "-=5", yoyo: true, repeat: 5, duration: 0.1 }, "+=0")
     .to(mainDoc, { scale: 0, opacity: 0, duration: 0.2 })
-    .to([piece1, piece2, piece3], { opacity: 1, duration: 0.2 })
-    .to(piece1, { x: LOCS.extractor.x - 20, y: LOCS.extractor.y + 20, rotation: -15, duration: 0.4 }, "-=0.2")
-    .to(piece2, { x: LOCS.extractor.x, y: LOCS.extractor.y + 30, rotation: 5, duration: 0.4 }, "-=0.4")
-    .to(piece3, { x: LOCS.extractor.x + 20, y: LOCS.extractor.y + 20, rotation: 15, duration: 0.4 }, "-=0.4")
+    .to([piece1, piece2, piece3], { opacity: 1, x: LOCS.extractor.x - 10, y: LOCS.extractor.y + 10, duration: 0 })
+    .to(piece1, { x: LOCS.extractor.x + 20, y: LOCS.extractor.y - 10, rotation: -15, duration: 0.4 }, "-=0.2")
+    .to(piece2, { x: LOCS.extractor.x + 30, y: LOCS.extractor.y, rotation: 5, duration: 0.4 }, "-=0.4")
+    .to(piece3, { x: LOCS.extractor.x + 40, y: LOCS.extractor.y - 10, rotation: 15, duration: 0.4 }, "-=0.4")
     .to(exBubb.group, { opacity: 0, duration: 0.2 }, "+=0.5");
 
-// 3. Orchestrator takes pieces
+// 3. Orchestrator distributes
 tl.to([piece1, piece2, piece3], {
-    x: LOCS.extractor.x + 20, y: LOCS.extractor.y - 10, rotation: 0, duration: 0.3
+    x: LOCS.extractor.x - 10, y: LOCS.extractor.y + 10, rotation: 0, duration: 0.3
 })
-    .add(walkAnim(orchestrator, 1.2, { x: LOCS.proc1.x - 20, y: LOCS.proc1.y + 10 }))
-    .to([piece1, piece2, piece3], { x: LOCS.proc1.x - 20, y: LOCS.proc1.y - 10, duration: 1.2 }, "-=1.2") // docs follow
-    .to(piece1, { x: LOCS.proc1.x + 10, y: LOCS.proc1.y + 10, duration: 0.3 }) // Drop piece1 at proc1
-    .add(walkAnim(orchestrator, 1, { x: LOCS.proc2.x - 20, y: LOCS.proc2.y + 10 }))
-    .to([piece2, piece3], { x: LOCS.proc2.x - 20, y: LOCS.proc2.y - 10, duration: 1 }, "-=1") // docs follow
-    .to(piece2, { x: LOCS.proc2.x + 10, y: LOCS.proc2.y + 10, duration: 0.3 }) // Drop piece2 at proc2
-    .to(piece3, { x: LOCS.proc2.x + 20, y: LOCS.proc2.y + 15, duration: 0.3 }); // Drop piece3 at proc2
+    .add(walkAnim(orchestrator, 1.5, { x: LOCS.proc1.x - 30, y: LOCS.proc1.y + 10 }))
+    .to([piece1, piece2, piece3], { x: LOCS.proc1.x - 20, y: LOCS.proc1.y + 10, duration: 1.5 }, "-=1.5")
+    .to(piece1, { x: LOCS.proc1.x + 20, y: LOCS.proc1.y - 10, duration: 0.3 })
 
-// 4. Processors working
-const p1c = document.getElementById('screen-rnr-processor-(1)');
-const p2c = document.getElementById('screen-rnr-processor-(2)');
-const rec = document.getElementById('screen-rnr-researcher');
+    .add(walkAnim(orchestrator, 1.5, { x: LOCS.proc2.x + 30, y: LOCS.proc2.y - 10 }))
+    .to([piece2, piece3], { x: LOCS.proc2.x + 40, y: LOCS.proc2.y - 10, duration: 1.5 }, "-=1.5")
+    .to(piece2, { x: LOCS.proc2.x - 20, y: LOCS.proc2.y + 10, duration: 0.3 })
+    .to(piece3, { x: LOCS.proc2.x - 10, y: LOCS.proc2.y + 15, duration: 0.3 });
+
+// 4. Processing
+const p1c = document.getElementById('screen-rnr-proc-1');
+const p2c = document.getElementById('screen-rnr-proc-2');
 
 tl.to(proc1, { x: "+=5", yoyo: true, repeat: 10, duration: 0.1 })
     .to(p1c, { fill: '#10b981', yoyo: true, repeat: 5, duration: 0.2 }, "-=1")
-    .to(piece1, { filter: 'hue-rotate(90deg)', duration: 0.5 }); // turn green
+    .to(piece1, { filter: 'hue-rotate(90deg)', duration: 0.5 });
 
-// Proc 2 encounters a vague comment -> Clarifier
-const p2Bubb = createSpeechBubble(LOCS.proc2.x + 50, LOCS.proc2.y, "Ambiguous edit...", "alert");
+// Proc 2 encounters vague comment
+const p2Bubb = createSpeechBubble(LOCS.proc2.x - 40, LOCS.proc2.y - 10, "Ambiguous...", "alert");
 tl.to(proc2, { x: "+=5", yoyo: true, repeat: 4, duration: 0.1 })
     .to(p2c, { fill: '#ef4444', duration: 0 })
     .to(p2Bubb.group, { opacity: 1, duration: 0.3 })
     .to(proc2, { x: "-=5", yoyo: true, repeat: 1, duration: 0.1 }, "+=0.3");
 
-// Clarifier pops up
-const clBubb = createSpeechBubble(LOCS.clarifier.x + 50, LOCS.clarifier.y, "Asking user...", "terminal");
+// Clarifier
+const clBubb = createSpeechBubble(LOCS.clarifier.x, LOCS.clarifier.y, "Asking user...", "terminal");
 tl.to(clBubb.group, { opacity: 1, y: "-=10", duration: 0.3 })
-    .add(walkAnim(clarifier, 1, { x: LOCS.clarifier.x + 60, y: LOCS.clarifier.y - 50 })) // Steps forward
+    .to(clarifier, { y: "-=5", yoyo: true, repeat: 4, duration: 0.1 });
 
-const usBubb = createSpeechBubble(LOCS.clarifier.x + 100, LOCS.clarifier.y - 80, "Accept change.", "think");
-tl.to(usBubb.group, { opacity: 1, y: "-=10", duration: 0.3 }) // User responds
+// User responds (from Orchestrator in kitchen maybe?)
+// Let Orchestrator walk to kitchen while Proc2 is blocked
+tl.add(walkAnim(orchestrator, 2.5, { x: LOCS.kitchenCenter.x - 30, y: LOCS.kitchenCenter.y + 20 }), "-=2.5");
+
+const usBubb = createSpeechBubble(LOCS.kitchenCenter.x - 30, LOCS.kitchenCenter.y, "Accept change.", "think");
+tl.to(usBubb.group, { opacity: 1, y: "-=10", duration: 0.3 })
     .to([usBubb.group, clBubb.group], { opacity: 0, duration: 0.3 }, "+=1");
 
-// Clarifier retreats
-tl.add(walkAnim(clarifier, 1, { x: LOCS.clarifier.x + 50, y: LOCS.clarifier.y + 40 }));
-
-// Proc 2 resumes piece 2
+// Proc 2 finishes piece 2
 tl.to(p2Bubb.group, { opacity: 0, duration: 0.2 })
     .to(p2c, { fill: '#10b981', duration: 0 })
     .to(proc2, { x: "+=5", yoyo: true, repeat: 6, duration: 0.1 })
     .to(piece2, { filter: 'hue-rotate(90deg)', duration: 0.5 });
 
-// Proc 2 encounters citation need -> Researcher
+// Proc 2 needs citation.
 tl.call(() => p2Bubb.setText("Needs citation!"))
     .to(p2c, { fill: '#8b5cf6', duration: 0 })
     .to(p2Bubb.group, { opacity: 1, duration: 0.2 });
 
-// Researcher works
-const reBubb = createSpeechBubble(LOCS.researcher.x + 50, LOCS.researcher.y, "Query NotebookLM", "terminal");
+const reBubb = createSpeechBubble(LOCS.researcher.x, LOCS.researcher.y, "Querying...", "terminal");
 tl.to(reBubb.group, { opacity: 1, y: "-=10", duration: 0.3 })
-    .to(researcher, { x: "+=5", yoyo: true, repeat: 8, duration: 0.1 })
-    .to(rec, { fill: '#8b5cf6', yoyo: true, repeat: 4, duration: 0.2 }, "-=0.8")
+    .to(researcher, { y: "-=5", yoyo: true, repeat: 6, duration: 0.1 })
     .to(reBubb.group, { opacity: 0, duration: 0.3 }, "+=0.3");
 
 // Proc 2 finishes piece 3
@@ -324,40 +555,42 @@ tl.to(p2Bubb.group, { opacity: 0, duration: 0.2 })
     .to(proc2, { x: "+=5", yoyo: true, repeat: 6, duration: 0.1 })
     .to(piece3, { filter: 'hue-rotate(90deg)', duration: 0.5 });
 
-// 5. Orchestrator picks up all pieces and walks to Assembler
-tl.add(walkAnim(orchestrator, 1, { x: LOCS.proc2.x - 20, y: LOCS.proc2.y - 10 }))
-    .to([piece2, piece3], { x: LOCS.proc2.x - 20, y: LOCS.proc2.y - 30, duration: 0.3 })
-    .add(walkAnim(orchestrator, 0.8, { x: LOCS.proc1.x - 20, y: LOCS.proc1.y - 10 }))
-    .to([piece2, piece3], { x: LOCS.proc1.x - 20, y: LOCS.proc1.y - 30, duration: 0.8 }, "-=0.8") // Docs follow
-    .to(piece1, { x: LOCS.proc1.x - 20, y: LOCS.proc1.y - 30, duration: 0.3 })
+// 5. Orchestrator collects pieces
+tl.add(walkAnim(orchestrator, 2.5, { x: LOCS.proc1.x - 30, y: LOCS.proc1.y + 10 }))
+    .to(piece1, { x: LOCS.proc1.x - 20, y: LOCS.proc1.y + 20, duration: 0.3 })
+    .add(walkAnim(orchestrator, 1.5, { x: LOCS.proc2.x + 30, y: LOCS.proc2.y - 10 }))
+    .to(piece1, { x: LOCS.proc2.x + 40, y: LOCS.proc2.y - 10, duration: 1.5 }, "-=1.5")
+    .to([piece2, piece3], { x: LOCS.proc2.x + 40, y: LOCS.proc2.y - 10, duration: 0.3 })
 
-    .add(walkAnim(orchestrator, 1.5, { x: LOCS.assembler.x - 20, y: LOCS.assembler.y + 10 }))
-    .to([piece1, piece2, piece3], { x: LOCS.assembler.x - 20, y: LOCS.assembler.y - 10, duration: 1.5 }, "-=1.5") // Docs follow
+    // go to assembler
+    .add(walkAnim(orchestrator, 1, { x: LOCS.assembler.x + 30, y: LOCS.assembler.y - 10 }))
+    .to([piece1, piece2, piece3], { x: LOCS.assembler.x + 40, y: LOCS.assembler.y - 10, duration: 1 }, "-=1")
 
-    // Drops pieces on assembler desk
-    .to(piece1, { x: LOCS.assembler.x - 10, y: LOCS.assembler.y + 20, duration: 0.3 })
-    .to(piece2, { x: LOCS.assembler.x + 10, y: LOCS.assembler.y + 10, duration: 0.3 }, "-=0.2")
-    .to(piece3, { x: LOCS.assembler.x + 30, y: LOCS.assembler.y + 20, duration: 0.3 }, "-=0.2");
+    // drop pieces
+    .to(piece1, { x: LOCS.assembler.x - 20, y: LOCS.assembler.y + 10, duration: 0.3 })
+    .to(piece2, { x: LOCS.assembler.x - 10, y: LOCS.assembler.y + 15, duration: 0.3 }, "-=0.2")
+    .to(piece3, { x: LOCS.assembler.x + 0, y: LOCS.assembler.y + 20, duration: 0.3 }, "-=0.2");
 
-// 6. Assembler packages
-const asBubb = createSpeechBubble(LOCS.assembler.x + 50, LOCS.assembler.y, "Packing .docx...", "terminal");
+// 6. Assembler works
+const asBubb = createSpeechBubble(LOCS.assembler.x - 40, LOCS.assembler.y, "Packing .docx", "terminal");
 tl.to(asBubb.group, { opacity: 1, y: "-=10", duration: 0.3 })
-    .to(assembler, { y: "-=10", yoyo: true, repeat: 5, duration: 0.1 })
-    .to([piece1, piece2, piece3], { opacity: 0, scale: 0, x: LOCS.assembler.x + 10, y: LOCS.assembler.y, duration: 0.3 }, "-=0.3")
-    .to(finalDoc, { opacity: 1, duration: 0.3 })
+    .to(assembler, { x: "+=5", yoyo: true, repeat: 5, duration: 0.1 })
+    .to([piece1, piece2, piece3], { opacity: 0, scale: 0, duration: 0.3 }, "-=0.3")
+    .to(finalDoc, { x: LOCS.assembler.x - 10, y: LOCS.assembler.y + 15, duration: 0 })
+    .to(finalDoc, { opacity: 1, scale: 1, duration: 0.3 })
     .to(asBubb.group, { opacity: 0, duration: 0.3 }, "+=0.3");
 
-// 7. Orchestrator takes Gold Doc to Outbox
-tl.to(finalDoc, { x: LOCS.assembler.x - 20, y: LOCS.assembler.y - 10, duration: 0.3 })
-    .add(walkAnim(orchestrator, 1.5, { x: LOCS.outbox.x - 20, y: LOCS.outbox.y }))
-    .to(finalDoc, { x: LOCS.outbox.x - 20, y: LOCS.outbox.y - 20, duration: 1.5 }, "-=1.5") // Docs follow
-    .to(finalDoc, { x: LOCS.outbox.x, y: LOCS.outbox.y, duration: 0.3 }) // Drop into outbox
+// 7. Orchestrator takes it to outbox (kitchen area for visual effect)
+tl.to(finalDoc, { x: LOCS.assembler.x + 30, y: LOCS.assembler.y - 10, duration: 0.3 })
+    .add(walkAnim(orchestrator, 2, { x: LOCS.kitchenCenter.x - 20, y: LOCS.kitchenCenter.y + 10 }))
+    .to(finalDoc, { x: LOCS.kitchenCenter.x - 10, y: LOCS.kitchenCenter.y + 10, duration: 2 }, "-=2")
 
-    // Celebration jump
-    .to(orchestrator, { y: "-=30", yoyo: true, repeat: 3, duration: 0.2 });
+    // Celebration
+    .to(orchestrator, { y: "-=20", yoyo: true, repeat: 3, duration: 0.2 });
 
-// Reset logic for looping happens automatically bc of GSAP, but need to reset some states visually
-tl.to([p1c, p2c, rec], { fill: '#1e293b', duration: 0.5 }) // turn off screens
+// Reset loop
+tl.to([p1c, p2c], { fill: '#1e293b', duration: 0.5 })
     .to(finalDoc, { opacity: 0, duration: 0.5 })
     .to(mainDoc, { scale: 1, opacity: 1, x: LOCS.inbox.x, y: LOCS.inbox.y, duration: 0 })
-    .add(walkAnim(orchestrator, 2, { x: LOCS.inbox.x, y: LOCS.inbox.y - 30 }));
+    .add(walkAnim(orchestrator, 3, { x: LOCS.inbox.x, y: LOCS.inbox.y }));
+
