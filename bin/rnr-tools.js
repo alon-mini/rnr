@@ -41,6 +41,33 @@ if (command === 'get-grouped-comments') {
     }
 }
 
+if (command === 'execute-extractor') {
+    const targetFile = process.argv[3];
+    const reviewer = process.argv[4] ? ` --reviewer "${process.argv[4]}"` : '';
+
+    if (!targetFile) {
+        console.error('Missing target file for extraction.');
+        process.exit(1);
+    }
+
+    const taskStr = `Task(
+  subagent_type="rnr-extractor",
+  model="claude-3-haiku-20240307",
+  prompt="Execute the comment extraction tool. Run this exact bash command: \\"python .rnr/src/parser.py ${targetFile}${reviewer}\\". Report the output back to me."
+)`;
+
+    console.log(`⏳ Spawning rnr-extractor...`);
+    // We use npx @anthropic-ai/claude-code with -p flag
+    const escapedPrompt = taskStr.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    try {
+        execSync(`npx @anthropic-ai/claude-code -p "${escapedPrompt}"`, { stdio: 'pipe' });
+        console.log(`✅ Extraction complete.`);
+    } catch (error) {
+        console.error(`❌ Failed to extract comments: ${error.message}`);
+    }
+    process.exit(0);
+}
+
 if (command === 'generate-extract-task') {
     const targetFile = process.argv[3];
     const reviewer = process.argv[4] ? ` --reviewer "${process.argv[4]}"` : '';
@@ -72,6 +99,38 @@ if (command === 'generate-assemble-task') {
   model="claude-3-haiku-20240307",
   prompt="Execute the document assembly tool. Run this exact bash command: \\"python .rnr/src/assembler.py ${originalFile} ${outputFile}\\". Report the outcome."
 )`);
+    process.exit(0);
+}
+
+if (command === 'execute-synthesizer') {
+    const taskStr = `Task(
+  subagent_type="rnr-synthesizer",
+  model="claude-3-haiku-20240307",
+  prompt="
+  <objective>
+  Analyze the parsed document text to create a comprehensive skills/style_skill.md capturing the author's unique voice, terminology, and citation style.
+  </objective>
+  
+  <files_to_read>
+  Read data/document_map.json at execution start using the Read tool. Optionally read unpacked/word/document.xml.
+  </files_to_read>
+  
+  <rules>
+  1. Deeply analyze the text for Tone & Voice, Vocabulary, Sentence Structure, Transitions & Flow, and Citation Style.
+  2. Produce a meticulously structured markdown file and save it to skills/style_skill.md using the Write tool.
+  3. DO NOT ask the user any questions.
+  </rules>
+  "
+)`;
+
+    console.log(`⏳ Spawning rnr-synthesizer...`);
+    const escapedPrompt = taskStr.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    try {
+        execSync(`npx @anthropic-ai/claude-code -p "${escapedPrompt}"`, { stdio: 'pipe' });
+        console.log(`✅ Style synthesized.`);
+    } catch (error) {
+        console.error(`❌ Failed to synthesize style: ${error.message}`);
+    }
     process.exit(0);
 }
 

@@ -191,8 +191,12 @@ node bin/install.js --claude --global
 ```
 You can now use `/rnr:update` inside Claude Code going forward.
 
+### Version 2.1.3 Notes
+- **Context Bloat Fixes Continued**: Applied the same Node script orchestration to the `/rnr:extract-comments` and `/rnr:synthesize-style` commands. Heavy JSON reading operations are now completely buffered from the main orchestrator agent.
+- **Update Optimization**: Fixed an issue where `/rnr:update` took a long time to search for the installation path. It now checks exact npm global paths for near-instant updates.
+
 ### Version 2.1 Notes
-- **Context Bloat Fix**: Orchestration logic has been natively moved to the `.rnr/bin/rnr-tools.js` Node script to entirely prevent the main `rnr` agent from absorbing subagent execution logs.
+- **Context Bloat Fix**: Orchestration logic for the comment processors has been natively moved to the `.rnr/bin/rnr-tools.js` Node script to entirely prevent the main `rnr` agent from absorbing subagent execution logs.
 - **Track Changes ID Bug Fix**: Fixed a bug where multiple edit suggestions in a single paragraph sharing the same `w:id` caused their `COMMENT_<ID>.md` files to silently overwrite each other. Edit IDs are now globally unique.
 
 ---

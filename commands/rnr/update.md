@@ -10,7 +10,10 @@ Run the Node.js update script `bin/update.js` located in the R&R installation di
 </objective>
 
 <process>
-1. Determine the path to the R&R installation directory (the folder where `bin/update.js` exists). Use `Bash` to `find` or `locate` `bin/update.js` if it isn't obvious, starting from the current directory or `~/.claude/commands/rnr` context.
-2. Once the R&R source directory is known, execute the script via bash: `node /path/to/rnr/bin/update.js`.
+1. Determine the path to the R&R installation directory. **CRITICAL: Do NOT use `find` or `locate` commands to search the hard drive as it is too slow.** 
+   Instead, use `Bash` to run `npm root -g` to get the global Node modules directory. 
+   Check if the update script exists at `<npm_global_root>/revise-and-resubmit-cc/bin/update.js`.
+   If it doesn't, check if it exists in the current working directory at `./bin/update.js`.
+2. Once the script path is found, execute it via bash: `node <path_to_update.js>`.
 3. Report success or display any terminal errors to the user.
 </process>
