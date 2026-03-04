@@ -3,6 +3,10 @@ import glob
 import re
 import subprocess
 import defusedxml.minidom
+from xml.sax.saxutils import escape as xml_escape
+
+def _escape_for_xml(text: str) -> str:
+    return xml_escape(text, entities={"'": "&apos;", '"': "&quot;"})
 
 def assemble_docx(original_file, data_dir="data", unpack_dir="unpacked", output_file="output.docx"):
     if not os.path.exists(original_file):
@@ -42,7 +46,7 @@ def assemble_docx(original_file, data_dir="data", unpack_dir="unpacked", output_
         reply_match = re.search(r"<reviewer_reply>(.*?)</reviewer_reply>", content, re.DOTALL)
         
         revised_text = revised_text_match.group(1).strip() if revised_text_match else "[Parse Error]"
-        reply = reply_match.group(1).strip() if reply_match else "[Parse Error]"
+        reply = _escape_for_xml(reply_match.group(1).strip()) if reply_match else "[Parse Error]"
         
         comment_id = os.path.basename(fpath).replace("COMMENT_", "").replace("_RESOLVED.md", "")
         comment_info = next((c for c in document_map if c["id"] == comment_id), None)

@@ -20,7 +20,13 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from xml.sax.saxutils import escape as xml_escape
+
 import defusedxml.minidom
+
+def _escape_xml_text(text: str) -> str:
+    """Escape special XML characters for safe insertion into XML content."""
+    return xml_escape(text, entities={"'": "&apos;", '"': "&quot;"})
 
 TEMPLATE_DIR = Path(__file__).parent / "templates"
 NS = {
@@ -95,7 +101,7 @@ def _append_xml(xml_path: Path, root_tag: str, content: str) -> None:
     xml_path.write_text(output, encoding="utf-8")
 
 
-def _find_para_id(comments_path: Path, comment_id: int) -> str | None:
+def _find_para_id(comments_path: Path, comment_id: str) -> str | None:
     dom = defusedxml.minidom.parseString(comments_path.read_text(encoding="utf-8"))
     for c in dom.getElementsByTagName("w:comment"):
         if c.getAttribute("w:id") == str(comment_id):
@@ -139,11 +145,9 @@ def _ensure_comment_relationships(unpacked_dir: Path) -> None:
     if not rels_path.exists():
         return
 
-    if _has_relationship(rels_path, "comments.xml"):
-        return  
-
     dom = defusedxml.minidom.parseString(rels_path.read_text(encoding="utf-8"))
     root = dom.documentElement
+    existing_targets = {rel.getAttribute("Target") for rel in dom.getElementsByTagName("Relationship")}
     next_rid = _get_next_rid(rels_path)
 
     rels = [
@@ -165,15 +169,19 @@ def _ensure_comment_relationships(unpacked_dir: Path) -> None:
         ),
     ]
 
+    changed = False
     for rel_type, target in rels:
-        rel = dom.createElement("Relationship")
-        rel.setAttribute("Id", f"rId{next_rid}")
-        rel.setAttribute("Type", rel_type)
-        rel.setAttribute("Target", target)
-        root.appendChild(rel)  
-        next_rid += 1
+        if target not in existing_targets:
+            rel = dom.createElement("Relationship")
+            rel.setAttribute("Id", f"rId{next_rid}")
+            rel.setAttribute("Type", rel_type)
+            rel.setAttribute("Target", target)
+            root.appendChild(rel)  
+            next_rid += 1
+            changed = True
 
-    rels_path.write_bytes(dom.toxml(encoding="UTF-8"))
+    if changed:
+        rels_path.write_bytes(dom.toxml(encoding="UTF-8"))
 
 
 def _ensure_comment_content_types(unpacked_dir: Path) -> None:
@@ -181,11 +189,9 @@ def _ensure_comment_content_types(unpacked_dir: Path) -> None:
     if not ct_path.exists():
         return
 
-    if _has_content_type(ct_path, "/word/comments.xml"):
-        return  
-
     dom = defusedxml.minidom.parseString(ct_path.read_text(encoding="utf-8"))
     root = dom.documentElement
+    existing_parts = {override.getAttribute("PartName") for override in dom.getElementsByTagName("Override")}
 
     overrides = [
         (
@@ -206,22 +212,26 @@ def _ensure_comment_content_types(unpacked_dir: Path) -> None:
         ),
     ]
 
+    changed = False
     for part_name, content_type in overrides:
-        override = dom.createElement("Override")
-        override.setAttribute("PartName", part_name)
-        override.setAttribute("ContentType", content_type)
-        root.appendChild(override)  
+        if part_name not in existing_parts:
+            override = dom.createElement("Override")
+            override.setAttribute("PartName", part_name)
+            override.setAttribute("ContentType", content_type)
+            root.appendChild(override)  
+            changed = True
 
-    ct_path.write_bytes(dom.toxml(encoding="UTF-8"))
+    if changed:
+        ct_path.write_bytes(dom.toxml(encoding="UTF-8"))
 
 
 def add_comment(
     unpacked_dir: str,
-    comment_id: int,
+    comment_id: str,
     text: str,
     author: str = "Claude",
     initials: str = "C",
-    parent_id: int | None = None,
+    parent_id: str | None = None,
 ) -> tuple[str, str]:
     word = Path(unpacked_dir) / "word"
     if not word.exists():
@@ -241,11 +251,11 @@ def add_comment(
         "w:comments",
         COMMENT_XML.format(
             id=comment_id,
-            author=author,
+            author=_escape_xml_text(author),
             date=ts,
-            initials=initials,
+            initials=_escape_xml_text(initials),
             para_id=para_id,
-            text=text,  
+            text=_escape_xml_text(text),  
         ),
     )
 
@@ -293,11 +303,11 @@ def add_comment(
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description="Add comments to DOCX documents")
     p.add_argument("unpacked_dir", help="Unpacked DOCX directory")
-    p.add_argument("comment_id", type=int, help="Comment ID (must be unique)")
+    p.add_argument("comment_id", type=str, help="Comment ID (must be unique)")
     p.add_argument("text", help="Comment text")
     p.add_argument("--author", default="Claude", help="Author name")
     p.add_argument("--initials", default="C", help="Author initials")
-    p.add_argument("--parent", type=int, help="Parent comment ID (for replies)")
+    p.add_argument("--parent", type=str, help="Parent comment ID (for replies)")
     args = p.parse_args()
 
     para_id, msg = add_comment(

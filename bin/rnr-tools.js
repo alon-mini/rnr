@@ -184,6 +184,10 @@ if (command === 'execute-tasks') {
     };
 
     console.log(`\n### Executing Tasks via Node Orchestrator ###\n`);
+    const pidPath = path.join(process.cwd(), '.rnr', 'orchestrator.pid');
+    if (fs.existsSync(path.dirname(pidPath))) {
+        fs.writeFileSync(pidPath, process.pid.toString());
+    }
 
     // Wave 1: Isolated
     if (classifications.isolated && classifications.isolated.length > 0) {
@@ -267,7 +271,7 @@ if (command === 'execute-tasks') {
   2. If any comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type='rnr-clarifier', prompt='Present this ambiguity to the user and ask how they want to proceed: [The context]'). Wait for its return string.
   3. Review how these comments relate to each other and draft the exact revised text blocks for each. You MUST execute the revisions yourself.
   4. Draft a strict, swift revision note (1 sentence maximum) for each comment.
-  5. Save your output by creating a separate data/COMMENT_<ID>_RESOLVED.md file for EACH comment in your group, using strictly this XML format in each file:
+  5. Save your output by creating a separate resolved markdown file for EACH comment in your group. The filename must exactly match the input filename but with '_RESOLVED' appended before the '.md' extension (e.g., if you read 'data/COMMENT_EDIT_25.md', output to 'data/COMMENT_EDIT_25_RESOLVED.md'). Use strictly this XML format in each file:
      <revised_text>
      [The exact revised text block]
      </revised_text>
@@ -285,4 +289,80 @@ if (command === 'execute-tasks') {
             }
         });
     }
+}
+
+if (command === 'health-check') {
+    const classificationPath = path.join(process.cwd(), 'data', 'classification.json');
+    if (!fs.existsSync(classificationPath)) {
+        console.log('No active processing session found (classification.json missing).');
+        process.exit(0);
+    }
+    const classifications = JSON.parse(fs.readFileSync(classificationPath, 'utf8'));
+
+    const requiredFiles = [];
+    if (classifications.isolated) {
+        classifications.isolated.forEach(id => requiredFiles.push(`COMMENT_${id}_RESOLVED.md`));
+    }
+    if (classifications.interlaced) {
+        classifications.interlaced.forEach(group => {
+            group.forEach(id => requiredFiles.push(`COMMENT_${id}_RESOLVED.md`));
+        });
+    }
+
+    const total = requiredFiles.length;
+    if (total === 0) {
+        console.log('No comments to process.');
+        process.exit(0);
+    }
+
+    let resolvedCount = 0;
+    let latestTime = 0;
+    let earliestTime = Date.now();
+
+    requiredFiles.forEach(f => {
+        const fullPath = path.join(process.cwd(), 'data', f);
+        if (fs.existsSync(fullPath)) {
+            resolvedCount++;
+            const stats = fs.statSync(fullPath);
+            const mtime = stats.mtimeMs;
+            if (mtime > latestTime) latestTime = mtime;
+            if (mtime < earliestTime) earliestTime = mtime;
+        }
+    });
+
+    const pidFile = path.join(process.cwd(), '.rnr', 'orchestrator.pid');
+    let isRunning = false;
+    if (fs.existsSync(pidFile)) {
+        try {
+            const pid = parseInt(fs.readFileSync(pidFile, 'utf8'), 10);
+            process.kill(pid, 0);
+            isRunning = true;
+        } catch (e) {
+            isRunning = false;
+        }
+    }
+
+    console.log(`\n### R&R Comment Processor Health Check ###\n`);
+    console.log(`Progress: ${resolvedCount} / ${total} comments resolved (${Math.round(resolvedCount / total * 100)}%)`);
+
+    if (resolvedCount === total) {
+        console.log(`Status: ALL DONE! You can now run '/rnr:assemble'.`);
+    } else if (resolvedCount > 1) {
+        const timeElapsed = latestTime - earliestTime;
+        const avgTimePerComment = timeElapsed / (resolvedCount - 1);
+        const remaining = total - resolvedCount;
+        const estimatedRemainingMs = remaining * avgTimePerComment;
+        const estimatedRemainingMins = Math.ceil(estimatedRemainingMs / 60000);
+        console.log(`Estimated time remaining: ~${estimatedRemainingMins} minutes.`);
+    }
+
+    if (resolvedCount < total) {
+        if (!isRunning && fs.existsSync(pidFile)) {
+            console.log(`\n[FAILED] The orchestrator process is no longer running, but there are still unprocessed comments.`);
+            console.log(`Please run the execute-tasks command again to resume.`);
+        } else {
+            console.log(`\n[HEALTHY] The orchestrator process is currently running.`);
+        }
+    }
+    process.exit(0);
 }

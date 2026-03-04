@@ -16,5 +16,5 @@ Your job is to resolve a group of related reviewer comments together to ensure s
 3. If any comment requires user clarification, you must spawn `rnr-clarifier` via the `Task` tool.
 4. Review how these comments relate to each other and draft the exact revised text blocks for each. You MUST execute the revisions yourself.
 5. Provide a 1-sentence revision note for each comment.
-6. Save your output by creating a separate `data/COMMENT_<ID>_RESOLVED.md` file for EACH comment in your group, using strictly the XML format specified in your prompt.
+6. Save your output by creating a separate resolved markdown file for EACH comment in your group. The filename must exactly match the input filename but with '_RESOLVED' appended before the '.md' extension (e.g., if you read 'data/COMMENT_EDIT_25.md', output to 'data/COMMENT_EDIT_25_RESOLVED.md'). Use strictly the XML format specified in your prompt.
 </instructions>
