@@ -41,3 +41,8 @@ Thumbs.db
 tests/output.docx
 error_log*.txt
 debug_document_output.xml
+
+# Orchestrator and config
+.rnr/orchestrator.pid
+.rnr/config.json
+.env

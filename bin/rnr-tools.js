@@ -167,21 +167,56 @@ if (command === 'execute-tasks') {
     const classifications = JSON.parse(fs.readFileSync(classificationPath, 'utf8'));
 
     // Helper function to safely escape quotes without cmd.exe string mangling
-    const executeAgent = (taskString) => {
+    const executeAgentAsync = (taskString, logLabel) => {
         const escapedPrompt = taskString.replace(/\n/g, ' ');
-        try {
-            // Using stdio: 'pipe' to suppress loud output from clogging the main orchestrator's context.
-            const result = spawnSync('npx', ['@anthropic-ai/claude-code', '--dangerously-skip-permissions', '-p', escapedPrompt], { stdio: 'pipe' });
-            if (result.status !== 0) {
-                console.error(`Error executing subagent: ${result.stderr ? result.stderr.toString() : 'Unknown spawn error'}`);
-                return false;
+        return new Promise((resolve) => {
+            try {
+                // Using stdio: 'pipe' to suppress loud output from clogging the main orchestrator's context.
+                const child = require('cross-spawn')('npx', ['@anthropic-ai/claude-code', '--dangerously-skip-permissions', '-p', escapedPrompt], { stdio: 'pipe' });
+
+                let stderrData = '';
+                if (child.stderr) {
+                    child.stderr.on('data', (data) => {
+                        stderrData += data.toString();
+                    });
+                }
+
+                child.on('close', (code) => {
+                    if (code !== 0) {
+                        console.error(`❌ Error executing subagent for ${logLabel}: ${stderrData || 'Unknown spawn error'}`);
+                        resolve(false);
+                    } else {
+                        resolve(true);
+                    }
+                });
+
+                child.on('error', (error) => {
+                    console.error(`❌ Error executing subagent for ${logLabel}: ${error.message}`);
+                    resolve(false);
+                });
+            } catch (error) {
+                console.error(`❌ Error executing subagent for ${logLabel}: ${error.message}`);
+                resolve(false);
             }
-            return true;
-        } catch (error) {
-            console.error(`Error executing subagent: ${error.message}`);
-            return false;
-        }
+        });
     };
+
+    async function processWithConcurrency(items, concurrency, processor) {
+        const results = [];
+        const executing = new Set();
+        for (const item of items) {
+            const p = processor(item).then(res => {
+                executing.delete(p);
+                return res;
+            });
+            executing.add(p);
+            results.push(p);
+            if (executing.size >= concurrency) {
+                await Promise.race(executing);
+            }
+        }
+        return Promise.all(results);
+    }
 
     console.log(`\n### Executing Tasks via Node Orchestrator ###\n`);
     const pidPath = path.join(process.cwd(), '.rnr', 'orchestrator.pid');
@@ -189,18 +224,19 @@ if (command === 'execute-tasks') {
         fs.writeFileSync(pidPath, process.pid.toString());
     }
 
-    // Wave 1: Isolated
-    if (classifications.isolated && classifications.isolated.length > 0) {
-        console.log(`\n#### Wave 1: Executing Isolated Comments ####\n`);
-        classifications.isolated.forEach(id => {
-            const resolvedPath = path.join(process.cwd(), 'data', 'resolved', `COMMENT_${id}_RESOLVED.md`);
-            if (fs.existsSync(resolvedPath)) {
-                console.log(`✅ COMMENT_${id} already resolved. Skipping.`);
-                return;
-            }
+    (async () => {
+        // Wave 1: Isolated
+        if (classifications.isolated && classifications.isolated.length > 0) {
+            console.log(`\n#### Wave 1: Executing Isolated Comments ####\n`);
+            await processWithConcurrency(classifications.isolated, 8, async (id) => {
+                const resolvedPath = path.join(process.cwd(), 'data', 'resolved', `COMMENT_${id}_RESOLVED.md`);
+                if (fs.existsSync(resolvedPath)) {
+                    console.log(`✅ COMMENT_${id} already resolved. Skipping.`);
+                    return true;
+                }
 
-            console.log(`⏳ Spawning subagent for COMMENT_${id}...`);
-            const taskStr = `Task(
+                console.log(`⏳ Spawning subagent for COMMENT_${id}...`);
+                const taskStr = `Task(
   subagent_type=\`rnr-processor-isolated\`,
   model=\`claude-3-7-sonnet-20250219\`,
   prompt=\`
@@ -229,30 +265,30 @@ if (command === 'execute-tasks') {
   </rules>
   \`
 )`;
-            const success = executeAgent(taskStr);
-            if (success) {
-                console.log(`✅ Processed COMMENT_${id} successfully.`);
-            } else {
-                console.log(`❌ Failed to process COMMENT_${id}.`);
-            }
-        });
-    }
+                const success = await executeAgentAsync(taskStr, `COMMENT_${id}`);
+                if (success) {
+                    console.log(`✅ Processed COMMENT_${id} successfully.`);
+                }
+                return success;
+            });
+        }
 
-    // Wave 2: Interlaced Groups
-    if (classifications.interlaced && classifications.interlaced.length > 0) {
-        console.log(`\n#### Wave 2: Executing Interlaced Groups ####\n`);
-        classifications.interlaced.forEach((group, index) => {
-            // Check if all are resolved
-            const allResolved = group.every(id => fs.existsSync(path.join(process.cwd(), 'data', 'resolved', `COMMENT_${id}_RESOLVED.md`)));
-            if (allResolved) {
-                console.log(`✅ Group ${index} already resolved. Skipping.`);
-                return;
-            }
+        // Wave 2: Interlaced Groups
+        if (classifications.interlaced && classifications.interlaced.length > 0) {
+            console.log(`\n#### Wave 2: Executing Interlaced Groups ####\n`);
+            await processWithConcurrency(classifications.interlaced, 8, async (group) => {
+                const groupStr = `Group [${group.join(', ')}]`;
+                // Check if all are resolved
+                const allResolved = group.every(id => fs.existsSync(path.join(process.cwd(), 'data', 'resolved', `COMMENT_${id}_RESOLVED.md`)));
+                if (allResolved) {
+                    console.log(`✅ ${groupStr} already resolved. Skipping.`);
+                    return true;
+                }
 
-            const filesList = group.map(id => `- data/extracted/COMMENT_${id}.md`).join('\\n  ');
-            console.log(`⏳ Spawning subagent for Group ${index} [${group.join(', ')}]...`);
+                const filesList = group.map(id => `- data/extracted/COMMENT_${id}.md`).join('\\n  ');
+                console.log(`⏳ Spawning subagent for ${groupStr}...`);
 
-            const taskStr = `Task(
+                const taskStr = `Task(
   subagent_type=\`rnr-processor-interlaced\`,
   model=\`claude-3-7-sonnet-20250219\`,
   prompt=\`
@@ -281,14 +317,14 @@ if (command === 'execute-tasks') {
   </rules>
   \`
 )`;
-            const success = executeAgent(taskStr);
-            if (success) {
-                console.log(`✅ Processed Group ${index} successfully.`);
-            } else {
-                console.log(`❌ Failed to process Group ${index}.`);
-            }
-        });
-    }
+                const success = await executeAgentAsync(taskStr, groupStr);
+                if (success) {
+                    console.log(`✅ Processed ${groupStr} successfully.`);
+                }
+                return success;
+            });
+        }
+    })();
 }
 
 if (command === 'health-check') {
