@@ -42,8 +42,30 @@ mock_document_xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 </w:document>
 """
 
+mock_content_types = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>
+"""
+
+mock_rels = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>
+"""
+
+mock_word_rels = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+</Relationships>
+"""
+
 os.makedirs("tests", exist_ok=True)
 with zipfile.ZipFile("tests/sample_paper.docx", "w", zipfile.ZIP_DEFLATED) as zf:
+    zf.writestr("[Content_Types].xml", mock_content_types)
+    zf.writestr("_rels/.rels", mock_rels)
+    zf.writestr("word/_rels/document.xml.rels", mock_word_rels)
     zf.writestr("word/comments.xml", mock_comments_xml)
     zf.writestr("word/document.xml", mock_document_xml)
 

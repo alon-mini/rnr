@@ -21,7 +21,7 @@ Run the Python script `.rnr/src/parser.py` on the provided `.docx` file to extra
    node .rnr/bin/rnr-tools.js execute-extractor {file} "{reviewer}"
    ```
 5. Wait for the node script to finish completely. Do NOT attempt to execute the python script directly. The script will securely spawn the `rnr-extractor` subagent in the background.
-6. Once the subagent finishes and returns the output to you, read the extracted metadata in `data/document_map.json`.
+6. Once the subagent finishes and returns the output to you, read the extracted metadata in `data/document_map.json` and review the files generated in `data/extracted/`.
 7. Output a brief, user-friendly summary of how many comments were found and extracted.
 8. Remind the user they can now run `/rnr:synthesize-style` or proceed straight to `/rnr:process-comments`.
 </process>

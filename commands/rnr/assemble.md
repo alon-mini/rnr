@@ -1,7 +1,7 @@
 ---
 name: rnr:assemble
 description: Repacks XML into a fully valid, formatted .docx
-argument-hint: "<output_file>"
+argument-hint: "<output_file> [--fresh]"
 allowed-tools:
   - Bash
   - Read

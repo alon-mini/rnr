@@ -6,7 +6,10 @@ import defusedxml.minidom
 from pathlib import Path
 
 def parse_docx(file_path, reviewer=None, data_dir="data", unpack_dir="unpacked"):
-    os.makedirs(data_dir, exist_ok=True)
+    extracted_dir = os.path.join(data_dir, "extracted")
+    resolved_dir = os.path.join(data_dir, "resolved")
+    os.makedirs(extracted_dir, exist_ok=True)
+    os.makedirs(resolved_dir, exist_ok=True)
     
     # Clean previous unpacks
     if os.path.exists(unpack_dir):
@@ -70,7 +73,7 @@ def parse_docx(file_path, reviewer=None, data_dir="data", unpack_dir="unpacked")
         })
         
         # Save to individual markdown files
-        comment_path = os.path.join(data_dir, f"COMMENT_{cid}.md")
+        comment_path = os.path.join(extracted_dir, f"COMMENT_{cid}.md")
         with open(comment_path, "w", encoding="utf-8") as f:
             f.write(f"<!-- ID: {cid} -->\n")
             f.write(f"<!-- TYPE: comment -->\n")
@@ -129,7 +132,7 @@ def parse_docx(file_path, reviewer=None, data_dir="data", unpack_dir="unpacked")
             })
             
             # Save to individual markdown files
-            comment_path = os.path.join(data_dir, f"COMMENT_{cid}.md")
+            comment_path = os.path.join(extracted_dir, f"COMMENT_{cid}.md")
             with open(comment_path, "w", encoding="utf-8") as f:
                 f.write(f"<!-- ID: {cid} -->\n")
                 f.write(f"<!-- TYPE: edit_suggestion -->\n")
@@ -146,10 +149,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file", help="Path to the docx file")
     parser.add_argument("--reviewer", help="Name of the reviewer to filter comments/suggestions by", default=None)
+    parser.add_argument("--data-dir", help="Directory to store extracted data", default="data")
+    parser.add_argument("--unpack-dir", help="Directory to unpack standard docx contents to", default="unpacked")
     args = parser.parse_args()
     
     if os.path.exists(args.file):
-        comments = parse_docx(args.file, reviewer=args.reviewer)
-        print(f"Extracted {len(comments)} comments/suggestions to data/ directory.")
+        comments = parse_docx(args.file, reviewer=args.reviewer, data_dir=args.data_dir, unpack_dir=args.unpack_dir)
+        print(f"Extracted {len(comments)} comments/suggestions to {args.data_dir}/ directory.")
     else:
         print("File not found.")

@@ -36,3 +36,8 @@ Thumbs.db
 # Documentation build and temp files
 .vuepress/dist
 .vuepress/tmp
+
+# Test outputs and debug logs
+tests/output.docx
+error_log*.txt
+debug_document_output.xml

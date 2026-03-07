@@ -56,7 +56,7 @@ if (command === 'execute-extractor') {
     const taskStr = `Task(
   subagent_type=\`rnr-extractor\`,
   model=\`claude-3-haiku-20240307\`,
-  prompt=\`Execute the comment extraction tool. Run this exact bash command: 'python .rnr/src/parser.py ${targetFile}${reviewer}'. Report the output back to me.\`
+  prompt=\`Execute the comment extraction tool. Run this exact bash command: 'python .rnr/src/parser.py ${targetFile}${reviewer} --data-dir ./data --unpack-dir ./unpacked'. Report the output back to me.\`
 )`;
 
     console.log(`⏳ Spawning rnr-extractor...`);
@@ -89,7 +89,7 @@ if (command === 'generate-extract-task') {
     console.log(`Task(
   subagent_type=\`rnr-extractor\`,
   model=\`claude-3-haiku-20240307\`,
-  prompt=\`Execute the comment extraction tool. Run this exact bash command: 'python .rnr/src/parser.py ${targetFile}${reviewer}'. Report the output back to me.\`
+  prompt=\`Execute the comment extraction tool. Run this exact bash command: 'python .rnr/src/parser.py ${targetFile}${reviewer} --data-dir ./data --unpack-dir ./unpacked'. Report the output back to me.\`
 )`);
     process.exit(0);
 }
@@ -106,7 +106,7 @@ if (command === 'generate-assemble-task') {
     console.log(`Task(
   subagent_type=\`rnr-assembler\`,
   model=\`claude-3-haiku-20240307\`,
-  prompt=\`Execute the document assembly tool. Run this exact bash command: 'python .rnr/src/assembler.py ${originalFile} ${outputFile}'. Report the outcome.\`
+  prompt=\`Execute the document assembly tool. Run this exact bash command: 'python .rnr/src/assembler.py ${originalFile} ${outputFile} --data-dir ./data --unpack-dir ./unpacked'. Report the outcome.\`
 )`);
     process.exit(0);
 }
@@ -193,7 +193,7 @@ if (command === 'execute-tasks') {
     if (classifications.isolated && classifications.isolated.length > 0) {
         console.log(`\n#### Wave 1: Executing Isolated Comments ####\n`);
         classifications.isolated.forEach(id => {
-            const resolvedPath = path.join(process.cwd(), 'data', `COMMENT_${id}_RESOLVED.md`);
+            const resolvedPath = path.join(process.cwd(), 'data', 'resolved', `COMMENT_${id}_RESOLVED.md`);
             if (fs.existsSync(resolvedPath)) {
                 console.log(`✅ COMMENT_${id} already resolved. Skipping.`);
                 return;
@@ -211,7 +211,7 @@ if (command === 'execute-tasks') {
   <files_to_read>
   Read these files at execution start using the Read tool:
   - skills/style_skill.md
-  - data/COMMENT_${id}.md
+  - data/extracted/COMMENT_${id}.md
   </files_to_read>
   
   <rules>
@@ -219,7 +219,7 @@ if (command === 'execute-tasks') {
   2. If the comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type='rnr-clarifier', prompt='Present this ambiguity to the user and ask how they want to proceed: [The context]'). Wait for its return string.
   3. Draft the exact revised text block that will replace the original text in the document. You MUST execute the revision yourself. Do NOT output manual instructions to the user.
   4. Draft a strict, swift revision note (1 sentence maximum) replying to the reviewer stating what was done.
-  5. Save your output to data/COMMENT_${id}_RESOLVED.md using strictly this XML format:
+  5. Save your output to data/resolved/COMMENT_${id}_RESOLVED.md using strictly this XML format:
      <revised_text>
      [The exact revised text block]
      </revised_text>
@@ -243,13 +243,13 @@ if (command === 'execute-tasks') {
         console.log(`\n#### Wave 2: Executing Interlaced Groups ####\n`);
         classifications.interlaced.forEach((group, index) => {
             // Check if all are resolved
-            const allResolved = group.every(id => fs.existsSync(path.join(process.cwd(), 'data', `COMMENT_${id}_RESOLVED.md`)));
+            const allResolved = group.every(id => fs.existsSync(path.join(process.cwd(), 'data', 'resolved', `COMMENT_${id}_RESOLVED.md`)));
             if (allResolved) {
                 console.log(`✅ Group ${index} already resolved. Skipping.`);
                 return;
             }
 
-            const filesList = group.map(id => `- data/COMMENT_${id}.md`).join('\\n  ');
+            const filesList = group.map(id => `- data/extracted/COMMENT_${id}.md`).join('\\n  ');
             console.log(`⏳ Spawning subagent for Group ${index} [${group.join(', ')}]...`);
 
             const taskStr = `Task(
@@ -271,7 +271,7 @@ if (command === 'execute-tasks') {
   2. If any comment is vague or explicitly non-actionable as-is, you MUST spawn this exact subagent to negotiate it: Task(subagent_type='rnr-clarifier', prompt='Present this ambiguity to the user and ask how they want to proceed: [The context]'). Wait for its return string.
   3. Review how these comments relate to each other and draft the exact revised text blocks for each. You MUST execute the revisions yourself.
   4. Draft a strict, swift revision note (1 sentence maximum) for each comment.
-  5. Save your output by creating a separate resolved markdown file for EACH comment in your group. The filename must exactly match the input filename but with '_RESOLVED' appended before the '.md' extension (e.g., if you read 'data/COMMENT_EDIT_25.md', output to 'data/COMMENT_EDIT_25_RESOLVED.md'). Use strictly this XML format in each file:
+  5. Save your output by creating a separate resolved markdown file for EACH comment in your group. The filename must exactly match the input filename but with '_RESOLVED' appended before the '.md' extension (e.g., if you read 'data/extracted/COMMENT_EDIT_25.md', output to 'data/resolved/COMMENT_EDIT_25_RESOLVED.md'). Use strictly this XML format in each file:
      <revised_text>
      [The exact revised text block]
      </revised_text>
@@ -320,7 +320,7 @@ if (command === 'health-check') {
     let earliestTime = Date.now();
 
     requiredFiles.forEach(f => {
-        const fullPath = path.join(process.cwd(), 'data', f);
+        const fullPath = path.join(process.cwd(), 'data', 'resolved', f);
         if (fs.existsSync(fullPath)) {
             resolvedCount++;
             const stats = fs.statSync(fullPath);

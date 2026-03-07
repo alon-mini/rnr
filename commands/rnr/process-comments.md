@@ -9,7 +9,7 @@ allowed-tools:
 ---
 
 <objective>
-Iterate through every `COMMENT_<ID>.md` file in `data/`, resolve the requested revisions strictly adhering to `skills/style_skill.md`, and output a `COMMENT_<ID>_RESOLVED.md` file for each.
+Iterate through every `COMMENT_<ID>.md` file in `data/extracted/`, resolve the requested revisions strictly adhering to `skills/style_skill.md`, and output a `COMMENT_<ID>_RESOLVED.md` file into `data/resolved/` for each.
 </objective>
 
 <core_principle>

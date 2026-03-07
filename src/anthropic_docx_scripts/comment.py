@@ -195,6 +195,8 @@ def _ensure_comment_relationships(unpacked_dir: Path) -> None:
     for rel_type, target in rels:
         if target not in existing_targets:
             rel = dom.createElement("Relationship")
+            # Reconstruct the namespace if dealing with prefixed XML
+            # Let minidom handle it by just appending to the documentElement
             rel.setAttribute("Id", f"rId{next_rid}")
             rel.setAttribute("Type", rel_type)
             rel.setAttribute("Target", target)
@@ -213,7 +215,13 @@ def _ensure_comment_content_types(unpacked_dir: Path) -> None:
 
     dom = defusedxml.minidom.parseString(ct_path.read_text(encoding="utf-8"))
     root = dom.documentElement
-    existing_parts = {override.getAttribute("PartName") for override in dom.getElementsByTagName("Override")}
+    
+    # Note: minidom parsing can be tricky with namespaces, so we check carefully
+    existing_parts = set()
+    for override in dom.getElementsByTagName("Override"):
+        part = override.getAttribute("PartName")
+        if part:
+            existing_parts.add(part)
 
     overrides = [
         (
@@ -237,6 +245,9 @@ def _ensure_comment_content_types(unpacked_dir: Path) -> None:
     changed = False
     for part_name, content_type in overrides:
         if part_name not in existing_parts:
+            # We must use createElementNS or createElement, but minidom toxml sometimes fails if we mix them 
+            # If the root has a namespace, we should be careful. 
+            # Standard MS Word has <Types xmlns="...">
             override = dom.createElement("Override")
             override.setAttribute("PartName", part_name)
             override.setAttribute("ContentType", content_type)
