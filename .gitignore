@@ -18,9 +18,11 @@ pnpm-debug.log*
 # Output and temporary directories
 unpacked/
 unpacked_test/
+data/
 *.tmp
 *.bak
 *.swp
+test*.js
 
 # OS generated files
 .DS_Store
