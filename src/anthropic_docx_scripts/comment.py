@@ -90,7 +90,13 @@ def _encode_smart_quotes(text: str) -> str:
 
 
 def _append_xml(xml_path: Path, root_tag: str, content: str) -> None:
-    dom = defusedxml.minidom.parseString(xml_path.read_text(encoding="utf-8"))
+    text = xml_path.read_text(encoding="utf-8")
+    for k, v in NS.items():
+        if f'xmlns:{k}="' not in text:
+            # Inject namespace into the root tag
+            text = text.replace(f'<{root_tag}', f'<{root_tag} xmlns:{k}="{v}"', 1)
+            
+    dom = defusedxml.minidom.parseString(text)
     root = dom.getElementsByTagName(root_tag)[0]
     ns_attrs = " ".join(f'xmlns:{k}="{v}"' for k, v in NS.items())
     wrapper_dom = defusedxml.minidom.parseString(f"<root {ns_attrs}>{content}</root>")
@@ -103,12 +109,28 @@ def _append_xml(xml_path: Path, root_tag: str, content: str) -> None:
 
 def _find_para_id(comments_path: Path, comment_id: str) -> str | None:
     dom = defusedxml.minidom.parseString(comments_path.read_text(encoding="utf-8"))
+    modified = False
+    para_id = None
     for c in dom.getElementsByTagName("w:comment"):
         if c.getAttribute("w:id") == str(comment_id):
             for p in c.getElementsByTagName("w:p"):
                 if pid := p.getAttribute("w14:paraId"):
-                    return pid
-    return None
+                    para_id = pid
+                    break
+                else:
+                    pid = _generate_hex_id()
+                    p.setAttribute("w14:paraId", pid)
+                    para_id = pid
+                    modified = True
+                    break
+            if para_id:
+                break
+                
+    if modified:
+        output = _encode_smart_quotes(dom.toxml(encoding="UTF-8").decode("utf-8"))
+        comments_path.write_text(output, encoding="utf-8")
+        
+    return para_id
 
 
 def _get_next_rid(rels_path: Path) -> int:
@@ -244,8 +266,8 @@ def add_comment(
     first_comment = not comments.exists()
     if first_comment:
         shutil.copy(TEMPLATE_DIR / "comments.xml", comments)
-        _ensure_comment_relationships(Path(unpacked_dir))
-        _ensure_comment_content_types(Path(unpacked_dir))
+    _ensure_comment_relationships(Path(unpacked_dir))
+    _ensure_comment_content_types(Path(unpacked_dir))
     _append_xml(
         comments,
         "w:comments",

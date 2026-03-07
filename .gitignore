@@ -1,0 +1,36 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Claude Code and other agent caches
+.a5c/
+.claude/
+.gemini/
+
+# Output and temporary directories
+unpacked/
+unpacked_test/
+*.tmp
+*.bak
+*.swp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation build and temp files
+.vuepress/dist
+.vuepress/tmp

@@ -428,7 +428,7 @@ class DOCXSchemaValidator(BaseSchemaValidator):
 
                         elem.setAttribute("w16cid:durableId", new_id)
                         print(
-                            f"  Repaired: {xml_file.name}: durableId {durable_id} → {new_id}"
+                            f"  Repaired: {xml_file.name}: durableId {durable_id} -> {new_id}"
                         )
                         repairs += 1
                         modified = True

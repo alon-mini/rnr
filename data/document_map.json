@@ -1,0 +1,16 @@
+[
+    {
+        "id": "1",
+        "author": "Reviewer 1",
+        "comment_text": "Please add a citation here regarding researcher skepticism.",
+        "target_text": "However, many researchers are skeptical.",
+        "type": "comment"
+    },
+    {
+        "id": "2",
+        "author": "Reviewer 2",
+        "comment_text": "Change to something more formal and academic.",
+        "target_text": "It was very good.",
+        "type": "comment"
+    }
+]
