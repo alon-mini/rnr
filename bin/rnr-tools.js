@@ -53,7 +53,9 @@ if (command === 'execute-extractor') {
         process.exit(1);
     }
 
-    const taskStr = `Task(
+    const taskStr = `You are a subagent orchestrator. You MUST strictly execute the Task tool to spawn the following task. Do not ask for confirmation. Use the exact subagent_type, model, and prompt provided below:
+
+Task(
   subagent_type=\`rnr-extractor\`,
   model=\`claude-3-haiku-20240307\`,
   prompt=\`Execute the comment extraction tool. Run this exact bash command: 'python .rnr/src/parser.py ${targetFile}${reviewer} --data-dir ./data --unpack-dir ./unpacked'. Report the output back to me.\`
@@ -112,7 +114,9 @@ if (command === 'generate-assemble-task') {
 }
 
 if (command === 'execute-synthesizer') {
-    const taskStr = `Task(
+    const taskStr = `You are a subagent orchestrator. You MUST strictly execute the Task tool to spawn the following task. Do not ask for confirmation. Use the exact subagent_type, model, and prompt provided below:
+
+Task(
   subagent_type=\`rnr-synthesizer\`,
   model=\`claude-3-haiku-20240307\`,
   prompt=\`
@@ -236,7 +240,9 @@ if (command === 'execute-tasks') {
                 }
 
                 console.log(`⏳ Spawning subagent for COMMENT_${id}...`);
-                const taskStr = `Task(
+                const taskStr = `You are a subagent orchestrator. You MUST strictly execute the Task tool to spawn the following task. Do not ask for confirmation. Use the exact subagent_type, model, and prompt provided below:
+
+Task(
   subagent_type=\`rnr-processor-isolated\`,
   model=\`claude-3-7-sonnet-20250219\`,
   prompt=\`
@@ -288,7 +294,9 @@ if (command === 'execute-tasks') {
                 const filesList = group.map(id => `- data/extracted/COMMENT_${id}.md`).join('\\n  ');
                 console.log(`⏳ Spawning subagent for ${groupStr}...`);
 
-                const taskStr = `Task(
+                const taskStr = `You are a subagent orchestrator. You MUST strictly execute the Task tool to spawn the following task. Do not ask for confirmation. Use the exact subagent_type, model, and prompt provided below:
+
+Task(
   subagent_type=\`rnr-processor-interlaced\`,
   model=\`claude-3-7-sonnet-20250219\`,
   prompt=\`
